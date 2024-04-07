@@ -88,11 +88,11 @@ export interface ReadableMapNode<K, V> extends ReadableNode<ReadonlyMap<K, V>> {
   subscribeKey: (
     key: K,
     notify: Notify<V | undefined>,
-    skipInitialNotify?: boolean,
+    skipInitialNotify?: boolean
   ) => void;
   subscribeKeys: (
     notify: NotifyKey<K, V | undefined>,
-    skipInitialNotify?: boolean,
+    skipInitialNotify?: boolean
   ) => void;
 }
 
@@ -129,7 +129,7 @@ function isShallow<T>(value: unknown): value is Shallow<T> {
 }
 
 function isPrimitive(
-  value: any,
+  value: any
 ): value is string | number | boolean | bigint | symbol | undefined | null {
   return (
     value === null ||
@@ -162,7 +162,7 @@ export interface Shallow<T> {
 
 export function makeShallow<T>(
   value: T,
-  isEqual: (previous: T, current: T) => boolean = simpleEquals,
+  isEqual: (previous: T, current: T) => boolean = simpleEquals
 ): Shallow<T> {
   return {
     value,
@@ -173,7 +173,7 @@ export function makeShallow<T>(
 
 export function node<T>(
   initValue: T,
-  isEqual: (a: T, b: T) => boolean = simpleEquals, // Non primitives require a custom isEqual func.
+  isEqual: (a: T, b: T) => boolean = simpleEquals // Non primitives require a custom isEqual func.
 ): Node<T> {
   // If isEqual is undefined verify that this
   // is a primitive value otherwise a custom
@@ -182,7 +182,7 @@ export function node<T>(
     throw Error(
       "Node requires a primitive value or a custom isEqual to be supplied. " +
         "Use makeShallow to provide a custom equals func for deep objects. Got: " +
-        initValue,
+        initValue
     );
   }
 
@@ -239,7 +239,7 @@ export function node<T>(
 export const undefnode = node(undefined);
 
 export function composeRead<T extends object>(
-  inputNodes: ReadableCompositeNodeValues<T>,
+  inputNodes: ReadableCompositeNodeValues<T>
 ): ReadableCompositeNode<T> {
   let computing = false;
   const nodes = inputNodes;
@@ -276,7 +276,7 @@ export function composeRead<T extends object>(
   for (const key in nodes) {
     // notify subscribers on any change to inner nodes.
     // as well as update self.
-    nodes[key].subscribe((_) => {
+    nodes[key].subscribe(_ => {
       // If we receive a notification and we are already
       // computing our value we can ignore to prevent extra
       // notifications.
@@ -314,7 +314,7 @@ export function composeRead<T extends object>(
 }
 
 export function compose<T extends object>(
-  inputNodes: CompositeNodeValues<T>,
+  inputNodes: CompositeNodeValues<T>
 ): CompositeNode<T> {
   const read = composeRead(inputNodes);
   const nodes = inputNodes;
@@ -352,7 +352,7 @@ export function compose<T extends object>(
 }
 
 export function compositeNode<T extends object>(
-  initialValue: T,
+  initialValue: T
 ): CompositeNode<T> {
   const buildNodes: Partial<CompositeNodeValues<T>> = {};
   for (const key in initialValue) {
@@ -362,7 +362,7 @@ export function compositeNode<T extends object>(
 }
 
 export function mapNode<K, V>(
-  initialValue?: ReadonlyMap<K, V> | undefined,
+  initialValue?: ReadonlyMap<K, V> | undefined
 ): MapNode<K, V> {
   // TODO: use a weak ref map? To clean up any nodes with no subscribers.
   const mapValue = new Map<K, Node<V | undefined>>();
@@ -428,10 +428,10 @@ export function mapNode<K, V>(
     if (!mapValue.has(key)) {
       // Initialize new nodes subs
       const newNode = node<V | undefined>(undefined);
-      allKeySubscriptions.forEach((notify) => {
+      allKeySubscriptions.forEach(notify => {
         newNode.subscribe(
-          (value) => notify(key, value),
-          /*skipInitialNotify=*/ true,
+          value => notify(key, value),
+          /*skipInitialNotify=*/ true
         );
       });
       mapValue.set(key, newNode);
@@ -464,7 +464,7 @@ export function mapNode<K, V>(
 
   const subscribe = (
     notify: Notify<ReadonlyMap<K, V>>,
-    skipInitialNotify = false,
+    skipInitialNotify = false
   ) => {
     get(); // get to compute current so it can be skipped
     if (skipInitialNotify) {
@@ -481,10 +481,10 @@ export function mapNode<K, V>(
     } else {
       const newNode = node<V | undefined>(undefined);
       mapValue.set(key, newNode);
-      allKeySubscriptions.forEach((notify) => {
+      allKeySubscriptions.forEach(notify => {
         newNode.subscribe(
-          (value) => notify(key, value),
-          /*skipInitialNotify*/ true,
+          value => notify(key, value),
+          /*skipInitialNotify*/ true
         );
       });
       return newNode as AnyNode<V | undefined>;
@@ -494,18 +494,18 @@ export function mapNode<K, V>(
   const subscribeKey = (
     key: K,
     notify: Notify<V | undefined>,
-    skipInitialNotify = false,
+    skipInitialNotify = false
   ) => {
     getKeyNode(key)?.subscribe(notify, skipInitialNotify);
   };
 
   const subscribeKeys = (
     notifyKey: NotifyKey<K, V | undefined>,
-    skipInitialNotify = false,
+    skipInitialNotify = false
   ) => {
     allKeySubscriptions.push(notifyKey);
     for (const [key, node] of mapValue) {
-      node.subscribe((value) => notifyKey(key, value), skipInitialNotify);
+      node.subscribe(value => notifyKey(key, value), skipInitialNotify);
     }
   };
 
@@ -532,14 +532,14 @@ export function makeDeepNode<T>(initVal: T | Shallow<T>): AnyNode<T> {
   if (isShallow(initVal)) {
     return node<T>(
       initVal.value as T,
-      initVal.isEqual,
+      initVal.isEqual
     ) as unknown as AnyNode<T>;
   } else if (isMap(initVal)) {
     return mapNode(initVal) as unknown as AnyNode<T>;
   } else if (isArray(initVal)) {
     // TODO: make arrayNode. use shallow for now.
     return node<T>(initVal, (a, b) =>
-      arraysEqual(a as [], b as []),
+      arraysEqual(a as [], b as [])
     ) as unknown as AnyNode<T>;
   } else if (isObjectWithKeysAndValues(initVal)) {
     // TODO: fix
@@ -557,20 +557,20 @@ export function makeDeepNode<T>(initVal: T | Shallow<T>): AnyNode<T> {
 export function edge<IV, OV>(
   read: ReadableNode<IV>,
   transformFunc: (input: IV) => OV,
-  isEqual?: (a: OV, b: OV) => boolean, // if set makes shallow node.
+  isEqual?: (a: OV, b: OV) => boolean // if set makes shallow node.
 ): ReadableAnyNode<OV> {
   const [val, _] = read.get();
   const initVal = transformFunc(val);
   const inputVal =
     isEqual == undefined ? initVal : makeShallow(initVal, isEqual);
   const outputNode = makeDeepNode(inputVal);
-  read.subscribe((value) => outputNode.set(transformFunc(value)), true); // Need to skip initial notify.
+  read.subscribe(value => outputNode.set(transformFunc(value)), true); // Need to skip initial notify.
   return outputNode;
 }
 
 export function makeSelector<IV, OV, Args extends any[]>(
   read: ReadableNode<IV>,
-  transformFunc: (input: IV, ...args: Args) => OV,
+  transformFunc: (input: IV, ...args: Args) => OV
 ): (...args: Args) => OV {
   return (...args: Args) => transformFunc(read.get()[0], ...args);
 }
@@ -578,13 +578,13 @@ export function makeSelector<IV, OV, Args extends any[]>(
 export function selfEdge<T, IV>(
   init: T,
   read: ReadableNode<IV>, // TODO: make readable only once compose is fixed.
-  transformFunc: (v: { self: T; read: IV }) => T,
+  transformFunc: (v: { self: T; read: IV }) => T
 ): AnyNode<T> {
   // Recursive notifies makes this a bit tricky.
   // But lets flatten out the loop.
   // We also want to notify on all changes.
   const selfNode = makeDeepNode(init);
-  read.subscribe((value) => {
+  read.subscribe(value => {
     let changed = true;
     do {
       const [selfVal, _] = selfNode.get();
@@ -601,8 +601,8 @@ export function mapToMapEdge<IK, IV, OK, OV, RV>(
   transformFunc: (
     key: IK,
     value: IV | undefined,
-    read: RV,
-  ) => [OK, OV | undefined],
+    read: RV
+  ) => [OK, OV | undefined]
 ): ReadableMapNode<OK, OV> {
   const $outMap = mapNode<OK, OV>();
   readMap.subscribeKeys((key, value) => {
@@ -611,7 +611,7 @@ export function mapToMapEdge<IK, IV, OK, OV, RV>(
     $outMap.setKey(newKey, newVal);
   });
 
-  read.subscribe((readVal) => {
+  read.subscribe(readVal => {
     const keyValues = readMap.get()[0];
     for (const [key, oldVal] of keyValues) {
       const [newKey, newVal] = transformFunc(key, oldVal, readVal);
@@ -624,10 +624,10 @@ export function mapToMapEdge<IK, IV, OK, OV, RV>(
 
 export function mapEdge<IV, OK, OV>(
   read: ReadableNode<IV>,
-  keyUpdateFunc: (read: IV) => [OK, OV][],
+  keyUpdateFunc: (read: IV) => [OK, OV][]
 ): ReadableMapNode<OK, OV> {
   const $outMap = mapNode<OK, OV>();
-  read.subscribe((value) => {
+  read.subscribe(value => {
     const keyValues = keyUpdateFunc(value);
     for (const [key, val] of keyValues) {
       $outMap.setKeyDefer(key, val);
@@ -639,14 +639,14 @@ export function mapEdge<IV, OK, OV>(
 
 export function mapKeyEdge<K, V>(read: ReadableMapNode<K, V>, key: K) {
   const $out = node<V | undefined>(undefined);
-  read.subscribeKey(key, (value) => $out.set(value));
+  read.subscribeKey(key, value => $out.set(value));
   return $out;
 }
 
 export function action<T, Args extends any[]>(
   name: string,
   mutate: WritableNode<T>,
-  transitionFunc: (...args: Args) => T,
+  transitionFunc: (...args: Args) => T
 ) {
   return (...args: Args): boolean => {
     let nextValue = transitionFunc(...args);
@@ -658,7 +658,7 @@ export function dependentAction<T, U, Args extends any[]>(
   name: string,
   mutate: WritableNode<T>,
   read: ReadableNode<U>,
-  transitionFunc: (read: U, ...args: Args) => T,
+  transitionFunc: (read: U, ...args: Args) => T
 ) {
   return (...args: Args): boolean => {
     const [readValue, _] = read?.get() ?? [undefined, false];

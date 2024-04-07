@@ -13,18 +13,18 @@ import {
   selfEdge,
   undefnode,
 } from "./graphState";
-import { arrayRange } from "../reader/helpers";
+import { arrayRange } from "./utils";
 
 test("node counter", () => {
   let subscribeValues1: number[] = [];
   let subscribeValues2: number[] = [];
   let $counter = node(0);
 
-  $counter.subscribe((val) => {
+  $counter.subscribe(val => {
     subscribeValues1.push(val);
   });
 
-  $counter.subscribe((val) => {
+  $counter.subscribe(val => {
     subscribeValues2.push(val);
   });
 
@@ -48,7 +48,7 @@ test("node undefined", () => {
   let subscribeValues1: (number | undefined)[] = [];
   let $counter = node<number | undefined>(undefined);
 
-  $counter.subscribe((val) => {
+  $counter.subscribe(val => {
     subscribeValues1.push(val);
   });
 
@@ -78,7 +78,7 @@ test("simple node composite", () => {
   let $composite = node<Composite>({ a: 1, b: 2 }, isEqual);
 
   let subscribeValues: Composite[] = [];
-  $composite.subscribe((val) => {
+  $composite.subscribe(val => {
     subscribeValues.push(val);
   });
 
@@ -105,7 +105,7 @@ test("node counter defer", () => {
   let subscribeValues1: number[] = [];
   let $counter = node(0);
 
-  $counter.subscribe((val) => {
+  $counter.subscribe(val => {
     subscribeValues1.push(val);
   });
 
@@ -138,27 +138,27 @@ test("compositeNode composite", () => {
   let $composite = compositeNode<Composite>({ a: 1, b: 2 });
 
   let subscribeValues: Composite[] = [];
-  $composite.subscribe((val) => {
+  $composite.subscribe(val => {
     subscribeValues.push(val);
   });
 
   let subscribeValuesA1: number[] = [];
-  $composite.nodes.a.subscribe((val) => {
+  $composite.nodes.a.subscribe(val => {
     subscribeValuesA1.push(val);
   });
 
   let subscribeValuesA2: number[] = [];
-  $composite.nodes.a.subscribe((val) => {
+  $composite.nodes.a.subscribe(val => {
     subscribeValuesA2.push(val);
   });
 
   let subscribeValuesB1: number[] = [];
-  $composite.nodes.b.subscribe((val) => {
+  $composite.nodes.b.subscribe(val => {
     subscribeValuesB1.push(val);
   });
 
   let subscribeValuesB2: number[] = [];
-  $composite.nodes.b.subscribe((val) => {
+  $composite.nodes.b.subscribe(val => {
     subscribeValuesB2.push(val);
   });
 
@@ -204,17 +204,17 @@ test("compositeNode deferred", () => {
   let $composite = compositeNode<Composite>({ a: 1, b: 1 });
 
   let subscribeValues: Composite[] = [];
-  $composite.subscribe((val) => {
+  $composite.subscribe(val => {
     subscribeValues.push(val);
   });
 
   let subscribeValuesA: number[] = [];
-  $composite.nodes.a.subscribe((val) => {
+  $composite.nodes.a.subscribe(val => {
     subscribeValuesA.push(val);
   });
 
   let subscribeValuesB: number[] = [];
-  $composite.nodes.b.subscribe((val) => {
+  $composite.nodes.b.subscribe(val => {
     subscribeValuesB.push(val);
   });
 
@@ -248,17 +248,17 @@ test("compositeNode deferred inner single", () => {
   let $composite = compositeNode<Composite>({ a: 1, b: 1 });
 
   let subscribeValues: Composite[] = [];
-  $composite.subscribe((val) => {
+  $composite.subscribe(val => {
     subscribeValues.push(val);
   });
 
   let subscribeValuesA: number[] = [];
-  $composite.nodes.a.subscribe((val) => {
+  $composite.nodes.a.subscribe(val => {
     subscribeValuesA.push(val);
   });
 
   let subscribeValuesB: number[] = [];
-  $composite.nodes.b.subscribe((val) => {
+  $composite.nodes.b.subscribe(val => {
     subscribeValuesB.push(val);
   });
 
@@ -303,17 +303,17 @@ test("compositeNode deferred inner nodes multiple", () => {
   let $composite = compositeNode<Composite>({ a: 1, b: 1 });
 
   let subscribeValues: Composite[] = [];
-  $composite.subscribe((val) => {
+  $composite.subscribe(val => {
     subscribeValues.push(val);
   });
 
   let subscribeValuesA: number[] = [];
-  $composite.nodes.a.subscribe((val) => {
+  $composite.nodes.a.subscribe(val => {
     subscribeValuesA.push(val);
   });
 
   let subscribeValuesB: number[] = [];
-  $composite.nodes.b.subscribe((val) => {
+  $composite.nodes.b.subscribe(val => {
     subscribeValuesB.push(val);
   });
 
@@ -360,7 +360,7 @@ test("compositeNode fuzz test", () => {
 test("mapNode empty single", () => {
   let $map = mapNode<number, string>();
   let subscribeValues: ReadonlyMap<number, string | undefined>[] = [];
-  $map.subscribe((val) => {
+  $map.subscribe(val => {
     subscribeValues.push(val);
   });
 
@@ -375,11 +375,11 @@ test("mapNode setKey", () => {
     new Map([
       [1, "one"],
       [2, "two"],
-    ]),
+    ])
   );
 
   let subscribeValues: ReadonlyMap<number, string | undefined>[] = [];
-  $map.subscribe((val) => {
+  $map.subscribe(val => {
     subscribeValues.push(val);
   });
 
@@ -389,7 +389,7 @@ test("mapNode setKey", () => {
   });
 
   let unitializedSubscriptionThree: (string | undefined)[] = [];
-  $map.subscribeKey(3, (val) => {
+  $map.subscribeKey(3, val => {
     unitializedSubscriptionThree.push(val);
   });
 
@@ -462,7 +462,7 @@ test("mapNode setKeyDefer undefined node", () => {
   let $map = mapNode<number, string>();
 
   let subscribeValues: ReadonlyMap<number, string | undefined>[] = [];
-  $map.subscribe((val) => {
+  $map.subscribe(val => {
     subscribeValues.push(val);
   });
 
@@ -472,7 +472,7 @@ test("mapNode setKeyDefer undefined node", () => {
   });
 
   let unitializedSubscriptionThree: (string | undefined)[] = [];
-  $map.subscribeKey(3, (val) => {
+  $map.subscribeKey(3, val => {
     unitializedSubscriptionThree.push(val);
   });
 
@@ -488,7 +488,7 @@ test("mapNode setKeyDefer undefined and defined node", () => {
   let $map = mapNode<number, string>(new Map([[1, "one"]]));
 
   let subscribeValues: ReadonlyMap<number, string | undefined>[] = [];
-  $map.subscribe((val) => {
+  $map.subscribe(val => {
     subscribeValues.push(val);
   });
 
@@ -498,12 +498,12 @@ test("mapNode setKeyDefer undefined and defined node", () => {
   });
 
   let subscriptionOne: (string | undefined)[] = [];
-  $map.subscribeKey(1, (val) => {
+  $map.subscribeKey(1, val => {
     subscriptionOne.push(val);
   });
 
   let unitializedSubscriptionThree: (string | undefined)[] = [];
-  $map.subscribeKey(3, (val) => {
+  $map.subscribeKey(3, val => {
     unitializedSubscriptionThree.push(val);
   });
 
@@ -537,7 +537,7 @@ test("mapNode setKeyDefer  delete key", () => {
   let $map = mapNode<number, string>(new Map([[1, "one"]]));
 
   let subscribeValues: ReadonlyMap<number, string | undefined>[] = [];
-  $map.subscribe((val) => {
+  $map.subscribe(val => {
     subscribeValues.push(val);
   });
 
@@ -547,7 +547,7 @@ test("mapNode setKeyDefer  delete key", () => {
   });
 
   let subscriptionOne: (string | undefined)[] = [];
-  $map.subscribeKey(1, (val) => {
+  $map.subscribeKey(1, val => {
     subscriptionOne.push(val);
   });
 
@@ -590,19 +590,19 @@ test("compose test", () => {
   const valuesC: number[] = [];
   const valuesE: string[] = [];
 
-  $composed.subscribe((val) => {
+  $composed.subscribe(val => {
     composedValues.push(val);
   });
-  $composed.nodes.a.subscribe((val) => {
+  $composed.nodes.a.subscribe(val => {
     valuesA.push(val);
   });
-  $composed.nodes.b.subscribe((val) => {
+  $composed.nodes.b.subscribe(val => {
     valuesB.push(val);
   });
-  $composed.nodes.c.subscribe((val) => {
+  $composed.nodes.c.subscribe(val => {
     valuesC.push(val);
   });
-  $composed.nodes.e.subscribe((val) => {
+  $composed.nodes.e.subscribe(val => {
     valuesE.push(val);
   });
 
@@ -643,10 +643,10 @@ test("compose test", () => {
 
 test("edge test", () => {
   const $in = node(1);
-  const $out = edge($in, (val) => val + 1);
+  const $out = edge($in, val => val + 1);
 
   const values: number[] = [];
-  $out.subscribe((val) => {
+  $out.subscribe(val => {
     values.push(val);
   });
 
@@ -668,27 +668,27 @@ test("edge test", () => {
 
 test("multiEdge test", () => {
   const $in = compositeNode({ a: 1, b: 2 });
-  const $out = edge($in, (val) => ({
+  const $out = edge($in, val => ({
     a: val.a + 1,
     b: val.b + 1,
     c: val.a + val.b,
   }));
 
   const values: { a: number; b: number; c: number }[] = [];
-  $out.subscribe((val) => {
+  $out.subscribe(val => {
     values.push(val);
   });
 
   const valuesA: number[] = [];
-  $out.nodes.a.subscribe((val) => {
+  $out.nodes.a.subscribe(val => {
     valuesA.push(val);
   });
   const valuesB: number[] = [];
-  $out.nodes.b.subscribe((val) => {
+  $out.nodes.b.subscribe(val => {
     valuesB.push(val);
   });
   const valuesC: number[] = [];
-  $out.nodes.c.subscribe((val) => {
+  $out.nodes.c.subscribe(val => {
     valuesC.push(val);
   });
 
@@ -734,11 +734,11 @@ test("multiEdge test", () => {
 test.only("Selfedge test", () => {
   const $input = node(1);
   const $out = selfEdge(1, $input, ({ self, read }) =>
-    self < read ? self + 1 : self,
+    self < read ? self + 1 : self
   );
   const values: number[] = [];
 
-  $out.subscribe((val) => {
+  $out.subscribe(val => {
     values.push(val);
   });
 
@@ -759,7 +759,7 @@ test("mapToMapEdge ", () => {
     new Map([
       [1, 1],
       [2, 2],
-    ]),
+    ])
   );
   const $output = mapToMapEdge($input, undefnode, (k, v, r) => [
     k,
@@ -767,12 +767,12 @@ test("mapToMapEdge ", () => {
   ]);
 
   let values: ReadonlyMap<number, number>[] = [];
-  $output.subscribe((val) => {
+  $output.subscribe(val => {
     values.push(val);
   });
 
   let values1: (number | undefined)[] = [];
-  $output.subscribeKey(1, (val) => {
+  $output.subscribeKey(1, val => {
     values1.push(val);
   });
 
@@ -782,7 +782,7 @@ test("mapToMapEdge ", () => {
   // });
 
   let values3: (number | undefined)[] = [];
-  $output.subscribeKey(3, (val) => {
+  $output.subscribeKey(3, val => {
     values3.push(val);
   });
 
@@ -840,23 +840,23 @@ test("mapToMapEdge ", () => {
 
 test("compositeToMapEdge ", () => {
   const $input = compositeNode({ a: 1, b: 2 });
-  const $output = mapEdge($input, (val) => [
+  const $output = mapEdge($input, val => [
     ["a", val.a + 1],
     ["b", val.b + 1],
   ]);
 
   let values: ReadonlyMap<string, number>[] = [];
-  $output.subscribe((val) => {
+  $output.subscribe(val => {
     values.push(val);
   });
 
   let valuesA: (number | undefined)[] = [];
-  $output.subscribeKey("a", (val) => {
+  $output.subscribeKey("a", val => {
     valuesA.push(val);
   });
 
   let valuesB: (number | undefined)[] = [];
-  $output.subscribeKey("b", (val) => {
+  $output.subscribeKey("b", val => {
     valuesB.push(val);
   });
 
@@ -893,7 +893,7 @@ test("dependentAction simple node no args ", () => {
     "incCounter",
     $counter,
     $counter,
-    (currentValue) => currentValue + 1,
+    currentValue => currentValue + 1
   );
   expect(incCounter()).toBe(true);
   expect($counter.get()).toEqual([1, false]);
@@ -935,7 +935,7 @@ test("action test", () => {
         // $map: new Map([[a, a.toString()]]),
       };
       return next;
-    },
+    }
   );
 
   expect(setAll(1)).toEqual(true);
