@@ -2,10 +2,10 @@ import { type ReadableNode } from "./graphState";
 
 export const classMap = (
   element: HTMLElement,
-  values: { [key: string]: ReadableNode<boolean | undefined> },
+  values: { [key: string]: ReadableNode<boolean | undefined> }
 ) => {
   for (const key in values) {
-    values[key].subscribe((value) => {
+    values[key].subscribe(value => {
       if (value) {
         element.classList.add(key);
       } else {
@@ -17,10 +17,10 @@ export const classMap = (
 
 export const style = (
   element: HTMLElement,
-  values: { [key: string]: ReadableNode<string | undefined> },
+  values: { [key: string]: ReadableNode<string | undefined> }
 ) => {
   for (const key in values) {
-    values[key].subscribe((value) => {
+    values[key].subscribe(value => {
       if (value) {
         element.style.setProperty(key, value);
       } else {
