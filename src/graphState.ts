@@ -4,7 +4,7 @@
 // 3. use builder syntax to flatten.
 // 4. detect cycles for deep node?
 
-import { BehaviorSubject, distinctUntilChanged, skip } from "rxjs";
+import { BehaviorSubject, skip } from "rxjs";
 
 // 5. A reusable emit once filter? essentially set.
 // 6. A reusable init and deinit filter?
@@ -46,9 +46,9 @@ export type AnyNode<T> =
     ? MapNode<K, V>
     : [T] extends [object]
       ? CompositeNode<T>
-      : Node<T>;
+      : StateNode<T>;
 
-export interface Node<T> extends ReadableNode<T>, WritableNode<T> {}
+export interface StateNode<T> extends ReadableNode<T>, WritableNode<T> {}
 
 type ReadableCompositeNodeValues<T> = {
   readonly [P in keyof T]: ReadableAnyNode<T[P]>;
@@ -73,7 +73,7 @@ export interface WritableCompositeNode<T> extends WritableNode<T> {
 export interface CompositeNode<T>
   extends ReadableCompositeNode<T>,
     WritableCompositeNode<T>,
-    Node<T> {
+    StateNode<T> {
   nodes: CompositeNodeValues<T>;
 }
 
@@ -99,7 +99,7 @@ export interface ReadableMapNode<K, V> extends ReadableNode<ReadonlyMap<K, V>> {
 export interface MapNode<K, V>
   extends WritableMapNode<K, V>,
     ReadableMapNode<K, V>,
-    Node<ReadonlyMap<K, V>> {}
+    StateNode<ReadonlyMap<K, V>> {}
 
 const simpleEquals = <T>(a: T, b: T) => a === b;
 
@@ -174,7 +174,7 @@ export function makeShallow<T>(
 export function node<T>(
   initValue: T,
   isEqual: (a: T, b: T) => boolean = simpleEquals // Non primitives require a custom isEqual func.
-): Node<T> {
+): StateNode<T> {
   // If isEqual is undefined verify that this
   // is a primitive value otherwise a custom
   // equality function needs to be used.
@@ -365,7 +365,7 @@ export function mapNode<K, V>(
   initialValue?: ReadonlyMap<K, V> | undefined
 ): MapNode<K, V> {
   // TODO: use a weak ref map? To clean up any nodes with no subscribers.
-  const mapValue = new Map<K, Node<V | undefined>>();
+  const mapValue = new Map<K, StateNode<V | undefined>>();
   let computing = false;
 
   const getNoNotify: Get<ReadonlyMap<K, V>> = () => {
@@ -388,7 +388,7 @@ export function mapNode<K, V>(
   };
 
   let allKeySubscriptions: NotifyKey<K, V | undefined>[] = [
-    (key, value) => {
+    () => {
       // get and notify on any change to inner nodes.
       // notify subscribers on any change to inner nodes.
       // as well as update self.
@@ -648,6 +648,7 @@ export function action<T, Args extends any[]>(
   mutate: WritableNode<T>,
   transitionFunc: (...args: Args) => T
 ) {
+  name; // todo: fix
   return (...args: Args): boolean => {
     let nextValue = transitionFunc(...args);
     return mutate.set(nextValue);
@@ -660,6 +661,7 @@ export function dependentAction<T, U, Args extends any[]>(
   read: ReadableNode<U>,
   transitionFunc: (read: U, ...args: Args) => T
 ) {
+  name; // todo: fix
   return (...args: Args): boolean => {
     const [readValue, _] = read?.get() ?? [undefined, false];
     const nextValue = transitionFunc(readValue, ...args);

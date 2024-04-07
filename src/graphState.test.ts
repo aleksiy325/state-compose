@@ -731,7 +731,7 @@ test("multiEdge test", () => {
   expect(valuesC).toEqual([3, 5, 6, 9]);
 });
 
-test.only("Selfedge test", () => {
+test("Selfedge test", () => {
   const $input = node(1);
   const $out = selfEdge(1, $input, ({ self, read }) =>
     self < read ? self + 1 : self

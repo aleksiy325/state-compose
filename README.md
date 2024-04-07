@@ -1,4 +1,4 @@
-# vite-vanilla-ts-lib-starter
+# state-compose
 
 The starter is built on top of Vite 5.x and prepared for writing libraries in TypeScript. It generates a hybrid package - both support for CommonJS and ESM modules.
 
@@ -15,15 +15,15 @@ The starter is built on top of Vite 5.x and prepared for writing libraries in Ty
 
 ## GitHub Template
 
-This is a template repo. Click the green [Use this template](https://github.com/kbysiec/vite-vanilla-ts-lib-starter/generate) button to get started.
+This is a template repo. Click the green [Use this template](https://github.com/kbysiec/state-compose/generate) button to get started.
 
 ## Clone to local
 
 If you prefer to do it manually with the cleaner git history
 
 ```bash
-git clone https://github.com/kbysiec/vite-vanilla-ts-lib-starter.git
-cd vite-vanilla-ts-lib-starter
+git clone https://github.com/kbysiec/state-compose.git
+cd state-compose
 npm i
 ```
 

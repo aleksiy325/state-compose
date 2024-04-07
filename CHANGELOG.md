@@ -1,6 +1,6 @@
 # Change Log
 
-All notable changes to the "vite-vanilla-ts-lib-starter" project will be documented in this file.
+All notable changes to the "state-compose" project will be documented in this file.
 
 ## [0.0.3] - 2024-01-23
 
