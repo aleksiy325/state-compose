@@ -7,7 +7,8 @@
   "exports": {
     ".": {
       "require": "./dist/state-compose.cjs",
-      "import": "./dist/state-compose.mjs"
+      "import": "./dist/state-compose.mjs",
+      "types": "./dist/index.d.ts"
     },
     "./dist/": {
       "import": "./dist/",
