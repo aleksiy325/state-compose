@@ -107,6 +107,7 @@ declare const classMap: (element: HTMLElement, values: {
 declare const style: (element: HTMLElement, values: {
 	[key: string]: ReadableNode<string | undefined>;
 }) => void;
+declare const text: (element: HTMLElement, value: ReadableNode<string | undefined>) => void;
 declare const arrayRange: (start: number, stop: number, step?: number) => number[];
 
 declare namespace graphState {
@@ -116,7 +117,7 @@ declare namespace graphUtil {
 	export { arrayRange };
 }
 declare namespace graphRender {
-	export { classMap, style };
+	export { classMap, style, text };
 }
 
 export {

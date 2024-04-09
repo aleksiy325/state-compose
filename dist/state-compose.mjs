@@ -105,10 +105,10 @@ var P = function() {
           }
         else
           i.remove(this);
-      var h = this.initialTeardown;
-      if (m(h))
+      var b = this.initialTeardown;
+      if (m(b))
         try {
-          h();
+          b();
         } catch (y) {
           s = y instanceof T ? y.errors : [y];
         }
@@ -199,7 +199,7 @@ function se(t) {
 }
 function L() {
 }
-function x(t) {
+function j(t) {
   t();
 }
 var F = function(t) {
@@ -247,7 +247,7 @@ var ue = function() {
       try {
         e.next(r);
       } catch (n) {
-        j(n);
+        x(n);
       }
   }, t.prototype.error = function(r) {
     var e = this.partialObserver;
@@ -255,17 +255,17 @@ var ue = function() {
       try {
         e.error(r);
       } catch (n) {
-        j(n);
+        x(n);
       }
     else
-      j(r);
+      x(r);
   }, t.prototype.complete = function() {
     var r = this.partialObserver;
     if (r.complete)
       try {
         r.complete();
       } catch (e) {
-        j(e);
+        x(e);
       }
   }, t;
 }(), R = function(t) {
@@ -292,7 +292,7 @@ var ue = function() {
   }
   return r;
 }(F);
-function j(t) {
+function x(t) {
   se(t);
 }
 function ce(t) {
@@ -324,8 +324,8 @@ var N = function() {
     var e = new t();
     return e.source = this, e.operator = r, e;
   }, t.prototype.subscribe = function(r, e, n) {
-    var o = this, s = be(r) ? r : new R(r, e, n);
-    return x(function() {
+    var o = this, s = he(r) ? r : new R(r, e, n);
+    return j(function() {
       var i = o, u = i.operator, a = i.source;
       s.add(u ? u.call(s, a) : a ? o._subscribe(s) : o._trySubscribe(s));
     }), s;
@@ -380,11 +380,11 @@ function $(t) {
   var r;
   return (r = t ?? Q.Promise) !== null && r !== void 0 ? r : Promise;
 }
-function he(t) {
+function be(t) {
   return t && m(t.next) && m(t.error) && m(t.complete);
 }
-function be(t) {
-  return t && t instanceof F || he(t) && J(t);
+function he(t) {
+  return t && t instanceof F || be(t) && J(t);
 }
 function de(t) {
   return m(t == null ? void 0 : t.lift);
@@ -412,14 +412,14 @@ var ge = function(t) {
     return a.onFinalize = i, a.shouldUnsubscribe = u, a._next = n ? function(l) {
       try {
         n(l);
-      } catch (h) {
-        e.error(h);
+      } catch (b) {
+        e.error(b);
       }
     } : t.prototype._next, a._error = s ? function(l) {
       try {
         s(l);
-      } catch (h) {
-        e.error(h);
+      } catch (b) {
+        e.error(b);
       } finally {
         this.unsubscribe();
       }
@@ -458,7 +458,7 @@ var ge = function(t) {
       throw new me();
   }, r.prototype.next = function(e) {
     var n = this;
-    x(function() {
+    j(function() {
       var o, s;
       if (n._throwIfClosed(), !n.isStopped) {
         n.currentObservers || (n.currentObservers = Array.from(n.observers));
@@ -481,7 +481,7 @@ var ge = function(t) {
     });
   }, r.prototype.error = function(e) {
     var n = this;
-    x(function() {
+    j(function() {
       if (n._throwIfClosed(), !n.isStopped) {
         n.hasError = n.isStopped = !0, n.thrownError = e;
         for (var o = n.observers; o.length; )
@@ -490,7 +490,7 @@ var ge = function(t) {
     });
   }, r.prototype.complete = function() {
     var e = this;
-    x(function() {
+    j(function() {
       if (e._throwIfClosed(), !e.isStopped) {
         e.isStopped = !0;
         for (var n = e.observers; n.length; )
@@ -601,7 +601,7 @@ function ee(t) {
 function Oe(t) {
   return typeof t == "object" && t !== null && !ee(t);
 }
-function je(t) {
+function xe(t) {
   return t instanceof Map;
 }
 function te(t, r = q) {
@@ -633,26 +633,26 @@ function S(t, r = q) {
     subscribe: (p, v = !1) => (a(), v ? i.pipe(z(1)).subscribe(p) : i.subscribe(p))
   };
 }
-const xe = S(void 0);
+const je = S(void 0);
 function re(t) {
   let r = !1;
   const e = t, n = () => {
     const l = {};
-    let h = !1;
+    let b = !1;
     for (const g in e) {
       let [p, v] = e[g].get();
-      l[g] = p, h = h || v;
+      l[g] = p, b = b || v;
     }
-    return [l, h];
+    return [l, b];
   }, o = new V(n()[0]), s = o.asObservable(), i = (l) => {
     o.next(l);
   }, u = () => {
     r = !0;
-    const [l, h] = n();
-    return h && i(l), r = !1, [l, h];
+    const [l, b] = n();
+    return b && i(l), r = !1, [l, b];
   };
   for (const l in e)
-    e[l].subscribe((h) => {
+    e[l].subscribe((b) => {
       if (!r) {
         let [g, p] = u();
         p || i(g);
@@ -661,7 +661,7 @@ function re(t) {
   return {
     nodes: e,
     get: u,
-    subscribe: (l, h = !1) => (u(), h ? s.pipe(z(1)).subscribe(l) : s.subscribe(l))
+    subscribe: (l, b = !1) => (u(), b ? s.pipe(z(1)).subscribe(l) : s.subscribe(l))
   };
 }
 function B(t) {
@@ -695,9 +695,9 @@ function A(t) {
   const n = () => {
     const c = /* @__PURE__ */ new Map();
     let f = !1;
-    for (const [b, d] of r) {
+    for (const [h, d] of r) {
       let [_, k] = d.get();
-      _ !== void 0 && c.set(b, _), f = f || k;
+      _ !== void 0 && c.set(h, _), f = f || k;
     }
     return [c, f];
   }, o = new V(n()[0]), s = o.asObservable(), i = (c) => {
@@ -718,8 +718,8 @@ function A(t) {
   }, l = (c) => {
     var f;
     return r.has(c) ? (f = r.get(c)) == null ? void 0 : f.get() : [void 0, !1];
-  }, h = (c, f) => {
-    var b;
+  }, b = (c, f) => {
+    var h;
     if (!r.has(c)) {
       const d = S(void 0);
       u.forEach((_) => {
@@ -730,47 +730,47 @@ function A(t) {
         );
       }), r.set(c, d);
     }
-    return (b = r.get(c)) == null ? void 0 : b.setDefer(f);
+    return (h = r.get(c)) == null ? void 0 : h.setDefer(f);
   }, g = (c) => {
     var f;
-    for (const [b, d] of r)
-      c.has(b) || (f = r.get(b)) == null || f.setDefer(void 0), r.delete(b);
-    for (const [b, d] of c.entries())
-      h(b, d);
+    for (const [h, d] of r)
+      c.has(h) || (f = r.get(h)) == null || f.setDefer(void 0), r.delete(h);
+    for (const [h, d] of c.entries())
+      b(h, d);
     return a;
   }, p = (c, f) => {
-    let [b, d] = h(c, f)();
+    let [h, d] = b(c, f)();
     return d;
   }, v = (c) => {
-    let [f, b] = g(c)();
-    return b;
+    let [f, h] = g(c)();
+    return h;
   }, O = (c, f = !1) => (a(), f && s.pipe(z(1)).subscribe(c), s.subscribe(c)), y = (c) => {
     const f = r.get(c);
     if (f !== void 0)
       return f;
     {
-      const b = S(void 0);
-      return r.set(c, b), u.forEach((d) => {
-        b.subscribe(
+      const h = S(void 0);
+      return r.set(c, h), u.forEach((d) => {
+        h.subscribe(
           (_) => d(c, _),
           /*skipInitialNotify*/
           !0
         );
-      }), b;
+      }), h;
     }
-  }, ne = (c, f, b = !1) => {
+  }, ne = (c, f, h = !1) => {
     var d;
-    (d = y(c)) == null || d.subscribe(f, b);
+    (d = y(c)) == null || d.subscribe(f, h);
   }, oe = (c, f = !1) => {
     u.push(c);
-    for (const [b, d] of r)
-      d.subscribe((_) => c(b, _), f);
+    for (const [h, d] of r)
+      d.subscribe((_) => c(h, _), f);
   };
   return t == null || t.forEach((c, f) => {
     p(f, c);
   }), {
     get: a,
-    setKeyDefer: h,
+    setKeyDefer: b,
     setKey: p,
     getKey: l,
     setDefer: g,
@@ -787,7 +787,7 @@ function E(t) {
       t.value,
       t.isEqual
     );
-  if (je(t))
+  if (xe(t))
     return A(t);
   if (ee(t))
     return S(
@@ -859,7 +859,7 @@ function Ce(t, r, e, n) {
     return r.set(u);
   };
 }
-const Fe = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const Ve = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   action: Me,
   compose: B,
@@ -876,7 +876,7 @@ const Fe = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   mapToMapEdge: Ue,
   node: S,
   selfEdge: Te,
-  undefnode: xe
+  undefnode: je
 }, Symbol.toStringTag, { value: "Module" })), Ie = (t, r) => {
   for (const e in r)
     r[e].subscribe((n) => {
@@ -887,19 +887,24 @@ const Fe = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     r[e].subscribe((n) => {
       n ? t.style.setProperty(e, n) : t.style.removeProperty(e);
     });
-}, Ve = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+}, qe = (t, r) => {
+  r.subscribe((e) => {
+    t.textContent = e ?? "";
+  });
+}, ze = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   classMap: Ie,
-  style: Re
-}, Symbol.toStringTag, { value: "Module" })), qe = (t, r, e = 1) => Array.from(
+  style: Re,
+  text: qe
+}, Symbol.toStringTag, { value: "Module" })), Fe = (t, r, e = 1) => Array.from(
   { length: (r - t) / e + 1 },
   (n, o) => t + o * e
-), ze = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+), Be = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  arrayRange: qe
+  arrayRange: Fe
 }, Symbol.toStringTag, { value: "Module" }));
 export {
-  Ve as graphRender,
-  Fe as graphState,
-  ze as graphUtil
+  ze as graphRender,
+  Ve as graphState,
+  Be as graphUtil
 };
