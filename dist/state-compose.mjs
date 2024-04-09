@@ -6,7 +6,7 @@ var K = function(t, r) {
       Object.prototype.hasOwnProperty.call(n, o) && (e[o] = n[o]);
   }, K(t, r);
 };
-function w(t, r) {
+function E(t, r) {
   if (typeof r != "function" && r !== null)
     throw new TypeError("Class extends value " + String(r) + " is not a constructor or null");
   K(t, r);
@@ -203,7 +203,7 @@ function j(t) {
   t();
 }
 var F = function(t) {
-  w(r, t);
+  E(r, t);
   function r(e) {
     var n = t.call(this) || this;
     return n.isStopped = !1, e ? (n.destination = e, J(e) && e.add(n)) : n.destination = ae, n;
@@ -269,7 +269,7 @@ var ce = function() {
       }
   }, t;
 }(), R = function(t) {
-  w(r, t);
+  E(r, t);
   function r(e, n, o) {
     var s = t.call(this) || this, i;
     if (m(e) || !e)
@@ -406,7 +406,7 @@ function ge(t, r, e, n, o) {
   return new me(t, r, e, n, o);
 }
 var me = function(t) {
-  w(r, t);
+  E(r, t);
   function r(e, n, o, s, i, u) {
     var l = t.call(this, e) || this;
     return l.onFinalize = i, l.shouldUnsubscribe = u, l._next = n ? function(a) {
@@ -445,7 +445,7 @@ var me = function(t) {
     t(this), this.name = "ObjectUnsubscribedError", this.message = "object unsubscribed";
   };
 }), Z = function(t) {
-  w(r, t);
+  E(r, t);
   function r() {
     var e = t.call(this) || this;
     return e.closed = !1, e.currentObservers = null, e.observers = [], e.isStopped = !1, e.hasError = !1, e.thrownError = null, e;
@@ -525,7 +525,7 @@ var me = function(t) {
     return new H(e, n);
   }, r;
 }(N), H = function(t) {
-  w(r, t);
+  E(r, t);
   function r(e, n) {
     var o = t.call(this) || this;
     return o.destination = e, o.source = n, o;
@@ -544,7 +544,7 @@ var me = function(t) {
     return (o = (n = this.source) === null || n === void 0 ? void 0 : n.subscribe(e)) !== null && o !== void 0 ? o : W;
   }, r;
 }(Z), V = function(t) {
-  w(r, t);
+  E(r, t);
   function r(e) {
     var n = t.call(this) || this;
     return n._value = e, n;
@@ -667,7 +667,7 @@ function re(t) {
 function B(t) {
   const r = re(t), e = t, n = (s) => {
     for (const i in s)
-      e[i] === void 0 && (e[i] = E(s[i])), e[i].setDefer(s[i]);
+      e[i] === void 0 && (e[i] = w(s[i])), e[i].setDefer(s[i]);
     for (const i in e)
       (s === void 0 || s[i] === void 0) && delete e[i];
     return r.get;
@@ -686,7 +686,7 @@ function B(t) {
 function Ae(t) {
   const r = {};
   for (const e in t)
-    r[e] = E(t[e]);
+    r[e] = w(t[e]);
   return B(r);
 }
 function A(t) {
@@ -749,7 +749,7 @@ function A(t) {
     if (f !== void 0)
       return f;
     {
-      const h = S(void 0);
+      const h = w(void 0);
       return r.set(c, h), u.forEach((d) => {
         h.subscribe(
           (_) => d(c, _),
@@ -781,7 +781,7 @@ function A(t) {
     subscribe: O
   };
 }
-function E(t) {
+function w(t) {
   if (Ee(t))
     return S(
       t.value,
@@ -798,20 +798,20 @@ function E(t) {
     let r = {};
     const e = t;
     for (const n in e)
-      r[n] = E(e[n]);
+      r[n] = w(e[n]);
     return B(r);
   }
   return S(t);
 }
 function ke(t, r, e) {
-  const [n, o] = t.get(), s = r(n), i = e == null ? s : te(s, e), u = E(i);
+  const [n, o] = t.get(), s = r(n), i = e == null ? s : te(s, e), u = w(i);
   return t.subscribe((l) => u.set(r(l)), !0), u;
 }
 function Te(t, r) {
   return (...e) => r(t.get()[0], ...e);
 }
 function Ue(t, r, e) {
-  const n = E(t);
+  const n = w(t);
   return r.subscribe((o) => {
     let s = !0;
     do {
@@ -870,7 +870,7 @@ const Be = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   compositeNode: Ae,
   dependentAction: ne,
   edge: ke,
-  makeDeepNode: E,
+  makeDeepNode: w,
   makeSelector: Te,
   makeShallow: te,
   mapEdge: De,
@@ -889,15 +889,15 @@ const Be = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
 }, qe = (t, r) => {
   for (const e in r)
     r[e].subscribe((n) => {
-      n ? t.style.setProperty(e, n) : t.style.removeProperty(e);
+      n !== void 0 && (n ? t.style.setProperty(e, n) : t.style.removeProperty(e));
     });
 }, Fe = (t, r) => {
   r.subscribe((e) => {
-    t.textContent = e ?? "";
+    e !== void 0 && (t.textContent = e);
   });
 }, Ve = (t, r) => {
   r.subscribe((e) => {
-    t.style.display = e ? "" : "none";
+    e !== void 0 && (t.style.display = e ? "" : "none");
   });
 }, Ye = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
