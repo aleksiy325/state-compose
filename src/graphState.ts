@@ -434,7 +434,7 @@ export function mapNode<K, V>(
           /*skipInitialNotify=*/ true
         );
       });
-      mapValue.set(key, newNode as StateNode<V | undefined>);
+      mapValue.set(key, newNode);
     }
     return mapValue.get(key)?.setDefer(value) as Get<V | undefined>;
   };
@@ -479,9 +479,7 @@ export function mapNode<K, V>(
     if (curNode !== undefined) {
       return curNode as AnyNode<V | undefined>;
     } else {
-      const newNode = makeDeepNode<V | undefined>(undefined) as StateNode<
-        V | undefined
-      >;
+      const newNode = node<V | undefined>(undefined);
       mapValue.set(key, newNode);
       allKeySubscriptions.forEach(notify => {
         newNode.subscribe(
