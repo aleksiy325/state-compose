@@ -668,3 +668,12 @@ export function dependentAction<T, U, Args extends any[]>(
     return mutate.set(nextValue);
   };
 }
+
+export function selfAction<T, Args extends any[]>(
+  name: string,
+  readMutate: StateNode<T>,
+  transitionFunc: (read: T, ...args: Args) => T
+) {
+  name; // todo: fix
+  return dependentAction(name, readMutate, readMutate, transitionFunc);
+}
