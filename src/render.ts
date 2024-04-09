@@ -35,7 +35,9 @@ export const text = (
   value: ReadableNode<string | undefined>
 ) => {
   value.subscribe(value => {
-    element.textContent = value ?? "";
+    if (value !== undefined) {
+      element.textContent = value;
+    }
   });
 };
 
