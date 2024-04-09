@@ -21,10 +21,12 @@ export const style = (
 ) => {
   for (const key in values) {
     values[key].subscribe(value => {
-      if (value) {
-        element.style.setProperty(key, value);
-      } else {
-        element.style.removeProperty(key);
+      if (value !== undefined) {
+        if (value) {
+          element.style.setProperty(key, value);
+        } else {
+          element.style.removeProperty(key);
+        }
       }
     });
   }
@@ -46,6 +48,8 @@ export const show = (
   value: ReadableNode<boolean | undefined>
 ) => {
   value.subscribe(value => {
-    element.style.display = value ? "" : "none";
+    if (value !== undefined) {
+      element.style.display = value ? "" : "none";
+    }
   });
 };
