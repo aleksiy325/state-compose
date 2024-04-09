@@ -101,6 +101,7 @@ declare function mapEdge<IV, OK, OV>(read: ReadableNode<IV>, keyUpdateFunc: (rea
 declare function mapKeyEdge<K, V>(read: ReadableMapNode<K, V>, key: K): StateNode<V | undefined>;
 declare function action<T, Args extends any[]>(name: string, mutate: WritableNode<T>, transitionFunc: (...args: Args) => T): (...args: Args) => boolean;
 declare function dependentAction<T, U, Args extends any[]>(name: string, mutate: WritableNode<T>, read: ReadableNode<U>, transitionFunc: (read: U, ...args: Args) => T): (...args: Args) => boolean;
+declare function selfAction<T, Args extends any[]>(name: string, readMutate: StateNode<T>, transitionFunc: (read: T, ...args: Args) => T): (...args: Args) => boolean;
 declare const classMap: (element: HTMLElement, values: {
 	[key: string]: ReadableNode<boolean | undefined>;
 }) => void;
@@ -108,16 +109,17 @@ declare const style: (element: HTMLElement, values: {
 	[key: string]: ReadableNode<string | undefined>;
 }) => void;
 declare const text: (element: HTMLElement, value: ReadableNode<string | undefined>) => void;
+declare const show: (element: HTMLElement, value: ReadableNode<boolean | undefined>) => void;
 declare const arrayRange: (start: number, stop: number, step?: number) => number[];
 
 declare namespace graphState {
-	export { AnyNode, CompositeNode, Get, MapNode, Notify, NotifyKey, ReadableAnyNode, ReadableCompositeNode, ReadableMapNode, ReadableNode, Shallow, StateNode, WritableAnyNode, WritableCompositeNode, WritableMapNode, WritableNode, action, compose, composeRead, compositeNode, dependentAction, edge, makeDeepNode, makeSelector, makeShallow, mapEdge, mapKeyEdge, mapNode, mapToMapEdge, node, selfEdge, undefnode };
+	export { AnyNode, CompositeNode, Get, MapNode, Notify, NotifyKey, ReadableAnyNode, ReadableCompositeNode, ReadableMapNode, ReadableNode, Shallow, StateNode, WritableAnyNode, WritableCompositeNode, WritableMapNode, WritableNode, action, compose, composeRead, compositeNode, dependentAction, edge, makeDeepNode, makeSelector, makeShallow, mapEdge, mapKeyEdge, mapNode, mapToMapEdge, node, selfAction, selfEdge, undefnode };
 }
 declare namespace graphUtil {
 	export { arrayRange };
 }
 declare namespace graphRender {
-	export { classMap, style, text };
+	export { classMap, show, style, text };
 }
 
 export {

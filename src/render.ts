@@ -38,3 +38,12 @@ export const text = (
     element.textContent = value ?? "";
   });
 };
+
+export const show = (
+  element: HTMLElement,
+  value: ReadableNode<boolean | undefined>
+) => {
+  value.subscribe(value => {
+    element.style.display = value ? "" : "none";
+  });
+};
