@@ -29,3 +29,12 @@ export const style = (
     });
   }
 };
+
+export const text = (
+  element: HTMLElement,
+  value: ReadableNode<string | undefined>
+) => {
+  value.subscribe(value => {
+    element.textContent = value ?? "";
+  });
+};
