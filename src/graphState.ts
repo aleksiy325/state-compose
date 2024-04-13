@@ -5,6 +5,7 @@
 // 4. detect cycles for deep node?
 
 import { BehaviorSubject, skip } from "rxjs";
+import { Readable } from "stream";
 
 // 5. A reusable emit once filter? essentially set.
 // 6. A reusable init and deinit filter?
@@ -637,7 +638,10 @@ export function mapEdge<IV, OK, OV>(
   return $outMap;
 }
 
-export function mapKeyEdge<K, V>(read: ReadableMapNode<K, V>, key: K) {
+export function mapKeyEdge<K, V>(
+  read: ReadableMapNode<K, V>,
+  key: K
+): ReadableNode<V | undefined> {
   const $out = node<V | undefined>(undefined);
   read.subscribeKey(key, value => $out.set(value));
   return $out;

@@ -48,8 +48,12 @@ export const show = (
   value: ReadableNode<boolean | undefined>
 ) => {
   value.subscribe(value => {
+    console.log(element, element.classList);
     if (value !== undefined) {
       element.style.display = value ? "" : "none";
+      if (element.classList.contains("hidden") && value) {
+        element.classList.remove("hidden");
+      }
     }
   });
 };
