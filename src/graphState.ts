@@ -91,23 +91,21 @@ export interface CompositeNode<T>
 }
 
 export interface WritableMapNode<K, V> extends WritableNode<ReadonlyMap<K, V>> {
-  setKey: (key: K, value: V | undefined) => boolean;
-  setKeyDefer: (key: K, value: V | undefined) => Get<V | undefined>;
+  setKey: (key: K, value: V) => boolean;
+  setKeyDefer: (key: K, value: V) => Get<V>;
 }
 
 export interface ReadableMapNode<K, V> extends ReadableNode<ReadonlyMap<K, V>> {
-  getKey: (key: K) => [V | undefined, boolean];
-  getKeyNode: (key: K) => AnyNode<V | undefined>;
+  getKey: (key: K) => [V, boolean];
+  getKeyNode: (key: K) => AnyNode<V>;
   subscribeKey: (
     key: K,
-    notify: Notify<V | undefined>,
+    notify: Notify<V>,
     skipInitialNotify?: boolean
   ) => void;
-  subscribeKeys: (
-    notify: NotifyKey<K, V | undefined>,
-    skipInitialNotify?: boolean
-  ) => void;
-  decompose(): Map<K, ReadableNode<V | undefined>>;
+  subscribeKeys: (notify: NotifyKey<K, V>, skipInitialNotify?: boolean) => void;
+  decompose(): Map<K, ReadableNode<V>>;
+  defaultFactory: (key: K) => V;
 }
 
 export interface MapNode<K, V>
@@ -455,10 +453,11 @@ export function compositeNode<T extends object>(
 }
 
 export function mapNode<K, V>(
-  initialValue?: ReadonlyMap<K, V> | undefined
+  defaultFactory: (key: K) => V,
+  initialValue?: ReadonlyMap<K, V>
 ): MapNode<K, V> {
   // TODO: use a weak ref map? To clean up any nodes with no subscribers.
-  const mapValue = new Map<K, StateNode<V | undefined>>();
+  const mapValue = new Map<K, AnyNode<V>>();
   let computing = false;
 
   const getNoNotify: Get<ReadonlyMap<K, V>> = () => {
@@ -480,7 +479,7 @@ export function mapNode<K, V>(
     subject.next(val);
   };
 
-  let allKeySubscriptions: NotifyKey<K, V | undefined>[] = [
+  let allKeySubscriptions: NotifyKey<K, V>[] = [
     () => {
       // get and notify on any change to inner nodes.
       // notify subscribers on any change to inner nodes.
@@ -510,17 +509,18 @@ export function mapNode<K, V>(
     return [result as ReadonlyMap<K, V>, changed];
   };
 
-  const getKey = (key: K): [V | undefined, boolean] => {
-    if (mapValue.has(key)) {
-      return mapValue.get(key)?.get() as [V | undefined, boolean];
+  const getKey = (key: K): [V, boolean] => {
+    if (!mapValue.has(key)) {
+      setKeyDefer(key, defaultFactory(key))();
     }
-    return [undefined, false];
+    return mapValue.get(key)?.get() as [V, boolean];
   };
 
-  const setKeyDefer = (key: K, value: V | undefined): Get<V | undefined> => {
+  const setKeyDefer = (key: K, value: V): Get<V> => {
     if (!mapValue.has(key)) {
       // Initialize new nodes subs
-      const newNode = node<V | undefined>(undefined);
+      console.log(defaultFactory);
+      const newNode = makeDeepNode(defaultFactory(key));
       allKeySubscriptions.forEach(notify => {
         newNode.subscribe(
           value => notify(key, value),
@@ -529,13 +529,13 @@ export function mapNode<K, V>(
       });
       mapValue.set(key, newNode);
     }
-    return mapValue.get(key)?.setDefer(value) as Get<V | undefined>;
+    return mapValue.get(key)?.setDefer(value) as Get<V>;
   };
 
-  const setDefer = (value: ReadonlyMap<K, V | undefined>) => {
+  const setDefer = (value: ReadonlyMap<K, V>) => {
     for (const [key, _] of mapValue) {
       if (!value.has(key)) {
-        mapValue.get(key)?.setDefer(undefined);
+        mapValue.get(key)?.setDefer(defaultFactory(key));
       }
       mapValue.delete(key);
     }
@@ -545,7 +545,7 @@ export function mapNode<K, V>(
     return get;
   };
 
-  const setKey = (key: K, value: V | undefined): boolean => {
+  const setKey = (key: K, value: V): boolean => {
     let [_, changed] = setKeyDefer(key, value)();
     return changed;
   };
@@ -566,13 +566,13 @@ export function mapNode<K, V>(
     return observable.subscribe(notify);
   };
 
-  const getKeyNode = (key: K): AnyNode<V | undefined> => {
+  const getKeyNode = (key: K): AnyNode<V> => {
     // TODO: make deep nodes?
     const curNode = mapValue.get(key);
     if (curNode !== undefined) {
-      return curNode as AnyNode<V | undefined>;
+      return curNode;
     } else {
-      const newNode = node<V | undefined>(undefined);
+      const newNode = makeDeepNode<V>(defaultFactory(key));
       mapValue.set(key, newNode);
       allKeySubscriptions.forEach(notify => {
         newNode.subscribe(
@@ -580,20 +580,20 @@ export function mapNode<K, V>(
           /*skipInitialNotify*/ true
         );
       });
-      return newNode as AnyNode<V | undefined>;
+      return newNode;
     }
   };
 
   const subscribeKey = (
     key: K,
-    notify: Notify<V | undefined>,
+    notify: Notify<V>,
     skipInitialNotify = false
   ) => {
     getKeyNode(key)?.subscribe(notify, skipInitialNotify);
   };
 
   const subscribeKeys = (
-    notifyKey: NotifyKey<K, V | undefined>,
+    notifyKey: NotifyKey<K, V>,
     skipInitialNotify = false
   ) => {
     allKeySubscriptions.push(notifyKey);
@@ -657,6 +657,7 @@ export function mapNode<K, V>(
     action,
     dependentAction,
     selfAction,
+    defaultFactory,
   };
 }
 
@@ -667,14 +668,14 @@ export function makeDeepNode<T>(initVal: T | Shallow<T>): AnyNode<T> {
       initVal.isEqual
     ) as unknown as AnyNode<T>;
   } else if (isMap(initVal)) {
-    return mapNode(initVal) as unknown as AnyNode<T>;
+    // Nested factories not supported
+    return mapNode(() => undefined, initVal) as unknown as AnyNode<T>;
   } else if (isArray(initVal)) {
     // TODO: make arrayNode. use shallow for now.
     return node<T>(initVal, (a, b) =>
       arraysEqual(a as [], b as [])
     ) as unknown as AnyNode<T>;
   } else if (isObjectWithKeysAndValues(initVal)) {
-    // TODO: fix
     let nodes: any = {};
     const knownVal = initVal as Record<any, any>;
     for (const key in knownVal) {
@@ -737,16 +738,18 @@ export function selfEdge<T, IV>(
   return selfNode;
 }
 
-export function mapToMapEdge<IK, IV, OK, OV, RV>(
-  readMap: ReadableMapNode<IK, IV>,
+export function mapToMapEdge<K, IV, OV, RV>(
+  readMap: ReadableMapNode<K, IV>,
   read: ReadableNode<RV>,
-  transformFunc: (
-    key: IK,
-    value: IV | undefined,
-    read: RV
-  ) => [OK, OV | undefined]
-): ReadableMapNode<OK, OV> {
-  const $outMap = mapNode<OK, OV>();
+  transformFunc: (key: K, value: IV, read: RV) => [K, OV]
+): ReadableMapNode<K, OV> {
+  // New factory is the transform applied to old factory.
+  const newFactory = (key: K) => {
+    const [readVal, _] = read.get();
+    return transformFunc(key, readMap.defaultFactory(key), readVal)[1];
+  };
+
+  const $outMap = mapNode<K, OV>(newFactory);
   readMap.subscribeKeys((key, value) => {
     const [readVal, _] = read.get();
     const [newKey, newVal] = transformFunc(key, value, readVal);
@@ -766,9 +769,10 @@ export function mapToMapEdge<IK, IV, OK, OV, RV>(
 
 export function mapEdge<IV, OK, OV>(
   read: ReadableNode<IV>,
-  keyUpdateFunc: (read: IV) => [OK, OV][]
+  keyUpdateFunc: (read: IV) => [OK, OV][],
+  defaultFactory: (key: OK) => OV
 ): ReadableMapNode<OK, OV> {
-  const $outMap = mapNode<OK, OV>();
+  const $outMap = mapNode<OK, OV>(defaultFactory);
   read.subscribe(value => {
     const keyValues = keyUpdateFunc(value);
     for (const [key, val] of keyValues) {

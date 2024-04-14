@@ -358,7 +358,7 @@ test("compositeNode fuzz test", () => {
 });
 
 test("mapNode empty single", () => {
-  let $map = mapNode<number, string>();
+  let $map = mapNode<number, string | undefined>(() => undefined);
   let subscribeValues: ReadonlyMap<number, string | undefined>[] = [];
   $map.subscribe(val => {
     subscribeValues.push(val);
@@ -371,7 +371,8 @@ test("mapNode empty single", () => {
 });
 
 test("mapNode setKey", () => {
-  let $map = mapNode<number, string>(
+  let $map = mapNode<number, string | undefined>(
+    () => undefined,
     new Map([
       [1, "one"],
       [2, "two"],
@@ -459,7 +460,7 @@ test("mapNode setKey", () => {
 });
 
 test("mapNode setKeyDefer undefined node", () => {
-  let $map = mapNode<number, string>();
+  let $map = mapNode<number, string | undefined>(() => undefined);
 
   let subscribeValues: ReadonlyMap<number, string | undefined>[] = [];
   $map.subscribe(val => {
@@ -485,7 +486,10 @@ test("mapNode setKeyDefer undefined node", () => {
 });
 
 test("mapNode setKeyDefer undefined and defined node", () => {
-  let $map = mapNode<number, string>(new Map([[1, "one"]]));
+  let $map = mapNode<number, string | undefined>(
+    () => undefined,
+    new Map([[1, "one"]])
+  );
 
   let subscribeValues: ReadonlyMap<number, string | undefined>[] = [];
   $map.subscribe(val => {
@@ -534,7 +538,10 @@ test("mapNode setKeyDefer undefined and defined node", () => {
 });
 
 test("mapNode setKeyDefer  delete key", () => {
-  let $map = mapNode<number, string>(new Map([[1, "one"]]));
+  let $map = mapNode<number, string | undefined>(
+    () => undefined,
+    new Map([[1, "one"]])
+  );
 
   let subscribeValues: ReadonlyMap<number, string | undefined>[] = [];
   $map.subscribe(val => {
@@ -755,7 +762,8 @@ test("Selfedge test", () => {
 });
 
 test("mapToMapEdge ", () => {
-  const $input = mapNode<number, number>(
+  const $input = mapNode<number, number | undefined>(
+    () => undefined,
     new Map([
       [1, 1],
       [2, 2],
@@ -766,12 +774,12 @@ test("mapToMapEdge ", () => {
     v === undefined ? v : v + 1,
   ]);
 
-  let values: ReadonlyMap<number, number>[] = [];
+  let values: ReadonlyMap<number, number | undefined>[] = [];
   $output.subscribe(val => {
     values.push(val);
   });
 
-  let values1: (number | undefined)[] = [];
+  let values1: (number | undefined | undefined)[] = [];
   $output.subscribeKey(1, val => {
     values1.push(val);
   });
@@ -840,12 +848,16 @@ test("mapToMapEdge ", () => {
 
 test("compositeToMapEdge ", () => {
   const $input = compositeNode({ a: 1, b: 2 });
-  const $output = mapEdge($input, val => [
-    ["a", val.a + 1],
-    ["b", val.b + 1],
-  ]);
+  const $output = mapEdge(
+    $input,
+    val => [
+      ["a", val.a + 1],
+      ["b", val.b + 1],
+    ],
+    () => undefined
+  );
 
-  let values: ReadonlyMap<string, number>[] = [];
+  let values: ReadonlyMap<string, number | undefined>[] = [];
   $output.subscribe(val => {
     values.push(val);
   });
@@ -967,4 +979,30 @@ test("deepNode action test", () => {
 
   expect(setAll(2)).toEqual(true);
   expect($node.get()).toEqual([{ a: 2, b: { c: 2, d: 3 } }, false]);
+});
+
+test("deepNode undefined", () => {
+  interface Test {
+    a: number;
+    b: number;
+  }
+  const $node = makeDeepNode<undefined | Test>(undefined);
+
+  expect($node.get()).toEqual([undefined, false]);
+
+  // $node.decompose()
+  $node.set({ a: 1, b: 2 });
+  expect($node.get()).toEqual([{ a: 1, b: 2 }, false]);
+
+  // const setAll = action("setAll", $node, (next: number) => {
+  //   return {
+  //     a: next,
+  //     b: { c: next, d: next + 1 },
+  //   };
+  // });
+
+  // expect($node.get()).toEqual([{ a: 1, b: { c: 1, d: 2 } }, false]);
+
+  // expect(setAll(2)).toEqual(true);
+  // expect($node.get()).toEqual([{ a: 2, b: { c: 2, d: 3 } }, false]);
 });
