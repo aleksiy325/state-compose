@@ -3,9 +3,9 @@
 // 2. seperate deep and shallow composite nodes.
 // 3. use builder syntax to flatten.
 // 4. detect cycles for deep node?
+// Rename .nodes to decompose() instead as the opposite of compose.
 
 import { BehaviorSubject, skip } from "rxjs";
-import { Readable } from "stream";
 
 // 5. A reusable emit once filter? essentially set.
 // 6. A reusable init and deinit filter?
@@ -17,7 +17,6 @@ export type Get<T> = () => [T, boolean];
 export interface ReadableNode<T> {
   get: Get<T>;
   subscribe: (notify: Notify<T>, skipInitialNotify?: boolean) => void;
-  // TODO: builder syntax
   // edge<IV, OV>(
   //   transformFunc: (input: IV) => OV,
   // ): ReadableAnyNode<OV>;
@@ -64,18 +63,18 @@ type CompositeNodeValues<T> = {
 };
 
 export interface ReadableCompositeNode<T> extends ReadableNode<T> {
-  nodes: ReadableCompositeNodeValues<T>;
+  decompose(): ReadableCompositeNodeValues<T>;
 }
 
 export interface WritableCompositeNode<T> extends WritableNode<T> {
-  nodes: WritableCompositeNodeValues<T>;
+  decompose(): WritableCompositeNodeValues<T>;
 }
 
 export interface CompositeNode<T>
   extends ReadableCompositeNode<T>,
     WritableCompositeNode<T>,
     StateNode<T> {
-  nodes: CompositeNodeValues<T>;
+  decompose(): CompositeNodeValues<T>;
 }
 
 export interface WritableMapNode<K, V> extends WritableNode<ReadonlyMap<K, V>> {
@@ -95,6 +94,7 @@ export interface ReadableMapNode<K, V> extends ReadableNode<ReadonlyMap<K, V>> {
     notify: NotifyKey<K, V | undefined>,
     skipInitialNotify?: boolean
   ) => void;
+  decompose(): Map<K, ReadableNode<V | undefined>>;
 }
 
 export interface MapNode<K, V>
@@ -307,8 +307,12 @@ export function composeRead<T extends object>(
     return observable.subscribe(notify);
   };
 
+  const decompose = () => {
+    return nodes;
+  };
+
   return {
-    nodes: nodes,
+    decompose: decompose,
     get,
     subscribe,
   };
@@ -343,8 +347,12 @@ export function compose<T extends object>(
     return changed;
   };
 
+  const decompose = () => {
+    return nodes;
+  };
+
   return {
-    nodes: nodes,
+    decompose: decompose,
     get: read.get,
     subscribe: read.subscribe,
     setDefer,
@@ -515,6 +523,10 @@ export function mapNode<K, V>(
     setKey(key, value);
   });
 
+  const decompose = () => {
+    return mapValue;
+  };
+
   return {
     get,
     setKeyDefer,
@@ -526,6 +538,7 @@ export function mapNode<K, V>(
     subscribeKey,
     subscribeKeys,
     subscribe,
+    decompose,
   };
 }
 

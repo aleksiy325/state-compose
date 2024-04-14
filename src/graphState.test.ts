@@ -143,43 +143,43 @@ test("compositeNode composite", () => {
   });
 
   let subscribeValuesA1: number[] = [];
-  $composite.nodes.a.subscribe(val => {
+  $composite.decompose().a.subscribe(val => {
     subscribeValuesA1.push(val);
   });
 
   let subscribeValuesA2: number[] = [];
-  $composite.nodes.a.subscribe(val => {
+  $composite.decompose().a.subscribe(val => {
     subscribeValuesA2.push(val);
   });
 
   let subscribeValuesB1: number[] = [];
-  $composite.nodes.b.subscribe(val => {
+  $composite.decompose().b.subscribe(val => {
     subscribeValuesB1.push(val);
   });
 
   let subscribeValuesB2: number[] = [];
-  $composite.nodes.b.subscribe(val => {
+  $composite.decompose().b.subscribe(val => {
     subscribeValuesB2.push(val);
   });
 
   expect($composite.get()).toMatchObject([{ a: 1, b: 2 }, false]);
-  expect($composite.nodes.a.get()).toStrictEqual([1, false]);
-  expect($composite.nodes.b.get()).toStrictEqual([2, false]);
+  expect($composite.decompose().a.get()).toStrictEqual([1, false]);
+  expect($composite.decompose().b.get()).toStrictEqual([2, false]);
 
   expect($composite.set({ a: 2, b: 2 })).toStrictEqual(true);
   expect($composite.get()).toMatchObject([{ a: 2, b: 2 }, false]);
-  expect($composite.nodes.a.get()).toStrictEqual([2, false]);
-  expect($composite.nodes.b.get()).toStrictEqual([2, false]);
+  expect($composite.decompose().a.get()).toStrictEqual([2, false]);
+  expect($composite.decompose().b.get()).toStrictEqual([2, false]);
 
   expect($composite.set({ a: 2, b: 2 })).toStrictEqual(false); // no change
   expect($composite.get()).toMatchObject([{ a: 2, b: 2 }, false]);
-  expect($composite.nodes.a.get()).toStrictEqual([2, false]);
-  expect($composite.nodes.b.get()).toStrictEqual([2, false]);
+  expect($composite.decompose().a.get()).toStrictEqual([2, false]);
+  expect($composite.decompose().b.get()).toStrictEqual([2, false]);
 
   expect($composite.set({ a: 3, b: 2 })).toStrictEqual(true);
   expect($composite.get()).toMatchObject([{ a: 3, b: 2 }, false]);
-  expect($composite.nodes.a.get()).toStrictEqual([3, false]);
-  expect($composite.nodes.b.get()).toStrictEqual([2, false]);
+  expect($composite.decompose().a.get()).toStrictEqual([3, false]);
+  expect($composite.decompose().b.get()).toStrictEqual([2, false]);
 
   expect(subscribeValues).toEqual([
     { a: 1, b: 2 },
@@ -209,12 +209,12 @@ test("compositeNode deferred", () => {
   });
 
   let subscribeValuesA: number[] = [];
-  $composite.nodes.a.subscribe(val => {
+  $composite.decompose().a.subscribe(val => {
     subscribeValuesA.push(val);
   });
 
   let subscribeValuesB: number[] = [];
-  $composite.nodes.b.subscribe(val => {
+  $composite.decompose().b.subscribe(val => {
     subscribeValuesB.push(val);
   });
 
@@ -253,12 +253,12 @@ test("compositeNode deferred inner single", () => {
   });
 
   let subscribeValuesA: number[] = [];
-  $composite.nodes.a.subscribe(val => {
+  $composite.decompose().a.subscribe(val => {
     subscribeValuesA.push(val);
   });
 
   let subscribeValuesB: number[] = [];
-  $composite.nodes.b.subscribe(val => {
+  $composite.decompose().b.subscribe(val => {
     subscribeValuesB.push(val);
   });
 
@@ -270,11 +270,11 @@ test("compositeNode deferred inner single", () => {
   expect($composite.get()).toStrictEqual([{ a: 1, b: 1 }, false]);
 
   // Set inner nodes deferred.
-  $composite.nodes.a.setDefer(2);
+  $composite.decompose().a.setDefer(2);
 
-  $composite.nodes.a.setDefer(3);
+  $composite.decompose().a.setDefer(3);
 
-  $composite.nodes.a.setDefer(4);
+  $composite.decompose().a.setDefer(4);
 
   // Verify no subscriptions are notified of deferred changes.
   expect(subscribeValues).toEqual([{ a: 1, b: 1 }]);
@@ -283,7 +283,7 @@ test("compositeNode deferred inner single", () => {
 
   // Deferred changes are applied when get is called on an dependent node.
   // The inner node in this case.
-  expect($composite.nodes.a.get()).toStrictEqual([4, true]);
+  expect($composite.decompose().a.get()).toStrictEqual([4, true]);
 
   expect(subscribeValues).toEqual([
     { a: 1, b: 1 },
@@ -308,12 +308,12 @@ test("compositeNode deferred inner nodes multiple", () => {
   });
 
   let subscribeValuesA: number[] = [];
-  $composite.nodes.a.subscribe(val => {
+  $composite.decompose().a.subscribe(val => {
     subscribeValuesA.push(val);
   });
 
   let subscribeValuesB: number[] = [];
-  $composite.nodes.b.subscribe(val => {
+  $composite.decompose().b.subscribe(val => {
     subscribeValuesB.push(val);
   });
 
@@ -325,14 +325,14 @@ test("compositeNode deferred inner nodes multiple", () => {
   expect($composite.get()).toStrictEqual([{ a: 1, b: 1 }, false]);
 
   // Set inner nodes deferred.
-  $composite.nodes.a.setDefer(2);
-  $composite.nodes.b.setDefer(2);
+  $composite.decompose().a.setDefer(2);
+  $composite.decompose().b.setDefer(2);
 
-  $composite.nodes.a.setDefer(3);
-  $composite.nodes.b.setDefer(3);
+  $composite.decompose().a.setDefer(3);
+  $composite.decompose().b.setDefer(3);
 
-  $composite.nodes.a.setDefer(4);
-  $composite.nodes.b.setDefer(4);
+  $composite.decompose().a.setDefer(4);
+  $composite.decompose().b.setDefer(4);
 
   // Verify no subscriptions are notified of deferred changes.
   expect(subscribeValues).toEqual([{ a: 1, b: 1 }]);
@@ -341,7 +341,7 @@ test("compositeNode deferred inner nodes multiple", () => {
 
   // Deferred changes are applied when get is called on an dependent node.
   // The inner node in this case.
-  expect($composite.nodes.a.get()).toStrictEqual([4, true]);
+  expect($composite.decompose().a.get()).toStrictEqual([4, true]);
 
   expect(subscribeValues).toEqual([
     { a: 1, b: 1 },
@@ -574,9 +574,9 @@ test("compose test", () => {
 
   const $composed = compose({
     a: $node1,
-    b: $composite2.nodes.b,
-    c: $composite2.nodes.d,
-    e: $composite3.nodes.e,
+    b: $composite2.decompose().b,
+    c: $composite2.decompose().d,
+    e: $composite3.decompose().e,
   });
 
   const composedValues: {
@@ -593,16 +593,16 @@ test("compose test", () => {
   $composed.subscribe(val => {
     composedValues.push(val);
   });
-  $composed.nodes.a.subscribe(val => {
+  $composed.decompose().a.subscribe(val => {
     valuesA.push(val);
   });
-  $composed.nodes.b.subscribe(val => {
+  $composed.decompose().b.subscribe(val => {
     valuesB.push(val);
   });
-  $composed.nodes.c.subscribe(val => {
+  $composed.decompose().c.subscribe(val => {
     valuesC.push(val);
   });
-  $composed.nodes.e.subscribe(val => {
+  $composed.decompose().e.subscribe(val => {
     valuesE.push(val);
   });
 
@@ -628,7 +628,7 @@ test("compose test", () => {
   ]);
 
   // set inner composite node.
-  expect($composite3.nodes.e.set("fiveChanged")).toBe(true);
+  expect($composite3.decompose().e.set("fiveChanged")).toBe(true);
   expect($composed.get()).toEqual([
     { a: 2, b: 3, c: 5, e: "fiveChanged" },
     false,
@@ -680,15 +680,15 @@ test("multiEdge test", () => {
   });
 
   const valuesA: number[] = [];
-  $out.nodes.a.subscribe(val => {
+  $out.decompose().a.subscribe(val => {
     valuesA.push(val);
   });
   const valuesB: number[] = [];
-  $out.nodes.b.subscribe(val => {
+  $out.decompose().b.subscribe(val => {
     valuesB.push(val);
   });
   const valuesC: number[] = [];
-  $out.nodes.c.subscribe(val => {
+  $out.decompose().c.subscribe(val => {
     valuesC.push(val);
   });
 
@@ -705,7 +705,7 @@ test("multiEdge test", () => {
   expect(valuesB).toEqual([3, 4]);
   expect(valuesC).toEqual([3, 5]);
 
-  expect($in.nodes.a.set(3)).toBe(true);
+  expect($in.decompose().a.set(3)).toBe(true);
   expect($out.get()).toEqual([{ a: 4, b: 4, c: 6 }, false]);
   expect(values).toEqual([
     { a: 2, b: 3, c: 3 },
@@ -716,8 +716,8 @@ test("multiEdge test", () => {
   expect(valuesB).toEqual([3, 4]);
   expect(valuesC).toEqual([3, 5, 6]);
 
-  $in.nodes.a.setDefer(4);
-  $in.nodes.b.setDefer(5);
+  $in.decompose().a.setDefer(4);
+  $in.decompose().b.setDefer(5);
 
   expect($in.get()).toEqual([{ a: 4, b: 5 }, true]);
   expect(values).toEqual([
@@ -777,7 +777,7 @@ test("mapToMapEdge ", () => {
   });
 
   // let values2: (number | undefined)[] = [];
-  // $output.nodes.get(2)?.subscribe((val) => {
+  // $output.decompose().get(2)?.subscribe((val) => {
   //   values2.push(val);
   // });
 
@@ -877,7 +877,7 @@ test("compositeToMapEdge ", () => {
     false,
   ]);
 
-  $input.nodes.a.set(3);
+  $input.decompose().a.set(3);
   expect($output.get()).toEqual([
     new Map([
       ["a", 4],

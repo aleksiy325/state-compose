@@ -35,8 +35,8 @@ function M(t, r) {
   try {
     for (; (r === void 0 || r-- > 0) && !(o = n.next()).done; )
       s.push(o.value);
-  } catch (u) {
-    i = { error: u };
+  } catch (c) {
+    i = { error: c };
   } finally {
     try {
       o && !o.done && (e = n.return) && e.call(n);
@@ -89,15 +89,15 @@ var P = function() {
       if (i)
         if (this._parentage = null, Array.isArray(i))
           try {
-            for (var u = D(i), l = u.next(); !l.done; l = u.next()) {
-              var a = l.value;
-              a.remove(this);
+            for (var c = D(i), u = c.next(); !u.done; u = c.next()) {
+              var b = u.value;
+              b.remove(this);
             }
-          } catch (y) {
-            r = { error: y };
+          } catch (g) {
+            r = { error: g };
           } finally {
             try {
-              l && !l.done && (e = u.return) && e.call(u);
+              u && !u.done && (e = c.return) && e.call(c);
             } finally {
               if (r)
                 throw r.error;
@@ -105,27 +105,27 @@ var P = function() {
           }
         else
           i.remove(this);
-      var b = this.initialTeardown;
-      if (m(b))
+      var f = this.initialTeardown;
+      if (m(f))
         try {
-          b();
-        } catch (y) {
-          s = y instanceof T ? y.errors : [y];
+          f();
+        } catch (g) {
+          s = g instanceof T ? g.errors : [g];
         }
-      var g = this._finalizers;
-      if (g) {
+      var d = this._finalizers;
+      if (d) {
         this._finalizers = null;
         try {
-          for (var p = D(g), v = p.next(); !v.done; v = p.next()) {
-            var O = v.value;
+          for (var p = D(d), v = p.next(); !v.done; v = p.next()) {
+            var w = v.value;
             try {
-              Y(O);
-            } catch (y) {
-              s = s ?? [], y instanceof T ? s = C(C([], M(s)), M(y.errors)) : s.push(y);
+              B(w);
+            } catch (g) {
+              s = s ?? [], g instanceof T ? s = C(C([], M(s)), M(g.errors)) : s.push(g);
             }
           }
-        } catch (y) {
-          n = { error: y };
+        } catch (g) {
+          n = { error: g };
         } finally {
           try {
             v && !v.done && (o = p.return) && o.call(p);
@@ -142,7 +142,7 @@ var P = function() {
     var e;
     if (r && r !== this)
       if (this.closed)
-        Y(r);
+        B(r);
       else {
         if (r instanceof t) {
           if (r.closed || r._hasParent(this))
@@ -171,7 +171,7 @@ var P = function() {
 function J(t) {
   return t instanceof P || t && "closed" in t && m(t.remove) && m(t.add) && m(t.unsubscribe);
 }
-function Y(t) {
+function B(t) {
   m(t) ? t() : t.unsubscribe();
 }
 var Q = {
@@ -197,7 +197,7 @@ function ie(t) {
     throw t;
   });
 }
-function L() {
+function Y() {
 }
 function j(t) {
   t();
@@ -206,7 +206,7 @@ var F = function(t) {
   E(r, t);
   function r(e) {
     var n = t.call(this) || this;
-    return n.isStopped = !1, e ? (n.destination = e, J(e) && e.add(n)) : n.destination = ae, n;
+    return n.isStopped = !1, e ? (n.destination = e, J(e) && e.add(n)) : n.destination = le, n;
   }
   return r.create = function(e, n, o) {
     return new R(e, n, o);
@@ -233,11 +233,11 @@ var F = function(t) {
       this.unsubscribe();
     }
   }, r;
-}(P), ue = Function.prototype.bind;
+}(P), ce = Function.prototype.bind;
 function U(t, r) {
-  return ue.call(t, r);
+  return ce.call(t, r);
 }
-var ce = function() {
+var ue = function() {
   function t(r) {
     this.partialObserver = r;
   }
@@ -279,37 +279,37 @@ var ce = function() {
         complete: o ?? void 0
       };
     else {
-      var u;
-      s && Q.useDeprecatedNextContext ? (u = Object.create(e), u.unsubscribe = function() {
+      var c;
+      s && Q.useDeprecatedNextContext ? (c = Object.create(e), c.unsubscribe = function() {
         return s.unsubscribe();
       }, i = {
-        next: e.next && U(e.next, u),
-        error: e.error && U(e.error, u),
-        complete: e.complete && U(e.complete, u)
+        next: e.next && U(e.next, c),
+        error: e.error && U(e.error, c),
+        complete: e.complete && U(e.complete, c)
       }) : i = e;
     }
-    return s.destination = new ce(i), s;
+    return s.destination = new ue(i), s;
   }
   return r;
 }(F);
 function x(t) {
   ie(t);
 }
-function le(t) {
+function ae(t) {
   throw t;
 }
-var ae = {
+var le = {
   closed: !0,
-  next: L,
-  error: le,
-  complete: L
+  next: Y,
+  error: ae,
+  complete: Y
 }, fe = function() {
   return typeof Symbol == "function" && Symbol.observable || "@@observable";
 }();
 function pe(t) {
   return t;
 }
-function be(t) {
+function he(t) {
   return t.length === 0 ? pe : t.length === 1 ? t[0] : function(e) {
     return t.reduce(function(n, o) {
       return o(n);
@@ -326,8 +326,8 @@ var N = function() {
   }, t.prototype.subscribe = function(r, e, n) {
     var o = this, s = de(r) ? r : new R(r, e, n);
     return j(function() {
-      var i = o, u = i.operator, l = i.source;
-      s.add(u ? u.call(s, l) : l ? o._subscribe(s) : o._trySubscribe(s));
+      var i = o, c = i.operator, u = i.source;
+      s.add(c ? c.call(s, u) : u ? o._subscribe(s) : o._trySubscribe(s));
     }), s;
   }, t.prototype._trySubscribe = function(r) {
     try {
@@ -339,11 +339,11 @@ var N = function() {
     var n = this;
     return e = $(e), new e(function(o, s) {
       var i = new R({
-        next: function(u) {
+        next: function(c) {
           try {
-            r(u);
-          } catch (l) {
-            s(l), i.unsubscribe();
+            r(c);
+          } catch (u) {
+            s(u), i.unsubscribe();
           }
         },
         error: s,
@@ -359,7 +359,7 @@ var N = function() {
   }, t.prototype.pipe = function() {
     for (var r = [], e = 0; e < arguments.length; e++)
       r[e] = arguments[e];
-    return be(r)(this);
+    return he(r)(this);
   }, t.prototype.toPromise = function(r) {
     var e = this;
     return r = $(r), new r(function(n, o) {
@@ -380,11 +380,11 @@ function $(t) {
   var r;
   return (r = t ?? Q.Promise) !== null && r !== void 0 ? r : Promise;
 }
-function he(t) {
+function be(t) {
   return t && m(t.next) && m(t.error) && m(t.complete);
 }
 function de(t) {
-  return t && t instanceof F || he(t) && J(t);
+  return t && t instanceof F || be(t) && J(t);
 }
 function ye(t) {
   return m(t == null ? void 0 : t.lift);
@@ -407,31 +407,31 @@ function ge(t, r, e, n, o) {
 }
 var me = function(t) {
   E(r, t);
-  function r(e, n, o, s, i, u) {
-    var l = t.call(this, e) || this;
-    return l.onFinalize = i, l.shouldUnsubscribe = u, l._next = n ? function(a) {
+  function r(e, n, o, s, i, c) {
+    var u = t.call(this, e) || this;
+    return u.onFinalize = i, u.shouldUnsubscribe = c, u._next = n ? function(b) {
       try {
-        n(a);
-      } catch (b) {
-        e.error(b);
+        n(b);
+      } catch (f) {
+        e.error(f);
       }
-    } : t.prototype._next, l._error = s ? function(a) {
+    } : t.prototype._next, u._error = s ? function(b) {
       try {
-        s(a);
-      } catch (b) {
-        e.error(b);
+        s(b);
+      } catch (f) {
+        e.error(f);
       } finally {
         this.unsubscribe();
       }
-    } : t.prototype._error, l._complete = o ? function() {
+    } : t.prototype._error, u._complete = o ? function() {
       try {
         o();
-      } catch (a) {
-        e.error(a);
+      } catch (b) {
+        e.error(b);
       } finally {
         this.unsubscribe();
       }
-    } : t.prototype._complete, l;
+    } : t.prototype._complete, u;
   }
   return r.prototype.unsubscribe = function() {
     var e;
@@ -463,15 +463,15 @@ var me = function(t) {
       if (n._throwIfClosed(), !n.isStopped) {
         n.currentObservers || (n.currentObservers = Array.from(n.observers));
         try {
-          for (var i = D(n.currentObservers), u = i.next(); !u.done; u = i.next()) {
-            var l = u.value;
-            l.next(e);
+          for (var i = D(n.currentObservers), c = i.next(); !c.done; c = i.next()) {
+            var u = c.value;
+            u.next(e);
           }
-        } catch (a) {
-          o = { error: a };
+        } catch (b) {
+          o = { error: b };
         } finally {
           try {
-            u && !u.done && (s = i.return) && s.call(i);
+            c && !c.done && (s = i.return) && s.call(i);
           } finally {
             if (o)
               throw o.error;
@@ -511,9 +511,9 @@ var me = function(t) {
   }, r.prototype._subscribe = function(e) {
     return this._throwIfClosed(), this._checkFinalizedStatuses(e), this._innerSubscribe(e);
   }, r.prototype._innerSubscribe = function(e) {
-    var n = this, o = this, s = o.hasError, i = o.isStopped, u = o.observers;
-    return s || i ? W : (this.currentObservers = null, u.push(e), new P(function() {
-      n.currentObservers = null, I(u, e);
+    var n = this, o = this, s = o.hasError, i = o.isStopped, c = o.observers;
+    return s || i ? W : (this.currentObservers = null, c.push(e), new P(function() {
+      n.currentObservers = null, I(c, e);
     }));
   }, r.prototype._checkFinalizedStatuses = function(e) {
     var n = this, o = n.hasError, s = n.thrownError, i = n.isStopped;
@@ -543,7 +543,7 @@ var me = function(t) {
     var n, o;
     return (o = (n = this.source) === null || n === void 0 ? void 0 : n.subscribe(e)) !== null && o !== void 0 ? o : W;
   }, r;
-}(Z), V = function(t) {
+}(Z), L = function(t) {
   E(r, t);
   function r(e) {
     var n = t.call(this) || this;
@@ -575,7 +575,7 @@ function Se(t, r) {
     }));
   });
 }
-function z(t) {
+function V(t) {
   return Se(function(r, e) {
     return t <= e;
   });
@@ -617,66 +617,66 @@ function S(t, r = q) {
       "Node requires a primitive value or a custom isEqual to be supplied. Use makeShallow to provide a custom equals func for deep objects. Got: " + t
     );
   let e = t, n = !1, o = t;
-  const s = new V(t), i = s.asObservable(), u = (p) => {
+  const s = new L(t), i = s.asObservable(), c = (p) => {
     s.next(p);
-  }, l = () => {
+  }, u = () => {
     let p = !1;
-    return n && !r(o, e) && (o = e, n = !1, p = !0, u(o)), [o, p];
-  }, a = (p) => (e = p, n = !0, l);
+    return n && !r(o, e) && (o = e, n = !1, p = !0, c(o)), [o, p];
+  }, b = (p) => (e = p, n = !0, u);
   return {
-    get: l,
+    get: u,
     set: (p) => {
-      let [v, O] = a(p)();
-      return O;
+      let [v, w] = b(p)();
+      return w;
     },
-    setDefer: a,
-    subscribe: (p, v = !1) => (l(), v ? i.pipe(z(1)).subscribe(p) : i.subscribe(p))
+    setDefer: b,
+    subscribe: (p, v = !1) => (u(), v ? i.pipe(V(1)).subscribe(p) : i.subscribe(p))
   };
 }
 const Pe = S(void 0);
 function re(t) {
   let r = !1;
   const e = t, n = () => {
-    const a = {};
-    let b = !1;
-    for (const g in e) {
-      let [p, v] = e[g].get();
-      a[g] = p, b = b || v;
+    const f = {};
+    let d = !1;
+    for (const p in e) {
+      let [v, w] = e[p].get();
+      f[p] = v, d = d || w;
     }
-    return [a, b];
-  }, o = new V(n()[0]), s = o.asObservable(), i = (a) => {
-    o.next(a);
-  }, u = () => {
+    return [f, d];
+  }, o = new L(n()[0]), s = o.asObservable(), i = (f) => {
+    o.next(f);
+  }, c = () => {
     r = !0;
-    const [a, b] = n();
-    return b && i(a), r = !1, [a, b];
+    const [f, d] = n();
+    return d && i(f), r = !1, [f, d];
   };
-  for (const a in e)
-    e[a].subscribe((b) => {
+  for (const f in e)
+    e[f].subscribe((d) => {
       if (!r) {
-        let [g, p] = u();
-        p || i(g);
+        let [p, v] = c();
+        v || i(p);
       }
     });
   return {
-    nodes: e,
-    get: u,
-    subscribe: (a, b = !1) => (u(), b ? s.pipe(z(1)).subscribe(a) : s.subscribe(a))
+    decompose: () => e,
+    get: c,
+    subscribe: (f, d = !1) => (c(), d ? s.pipe(V(1)).subscribe(f) : s.subscribe(f))
   };
 }
-function B(t) {
-  const r = re(t), e = t, n = (s) => {
-    for (const i in s)
-      e[i] === void 0 && (e[i] = w(s[i])), e[i].setDefer(s[i]);
-    for (const i in e)
-      (s === void 0 || s[i] === void 0) && delete e[i];
+function z(t) {
+  const r = re(t), e = t, n = (i) => {
+    for (const c in i)
+      e[c] === void 0 && (e[c] = O(i[c])), e[c].setDefer(i[c]);
+    for (const c in e)
+      (i === void 0 || i[c] === void 0) && delete e[c];
     return r.get;
-  }, o = (s) => {
-    let [i, u] = n(s)();
+  }, o = (i) => {
+    let [c, u] = n(i)();
     return u;
   };
   return {
-    nodes: e,
+    decompose: () => e,
     get: r.get,
     subscribe: r.subscribe,
     setDefer: n,
@@ -686,102 +686,103 @@ function B(t) {
 function Ae(t) {
   const r = {};
   for (const e in t)
-    r[e] = w(t[e]);
-  return B(r);
+    r[e] = O(t[e]);
+  return z(r);
 }
 function A(t) {
   const r = /* @__PURE__ */ new Map();
   let e = !1;
   const n = () => {
-    const c = /* @__PURE__ */ new Map();
-    let f = !1;
-    for (const [h, d] of r) {
-      let [_, k] = d.get();
-      _ !== void 0 && c.set(h, _), f = f || k;
+    const a = /* @__PURE__ */ new Map();
+    let l = !1;
+    for (const [h, y] of r) {
+      let [_, k] = y.get();
+      _ !== void 0 && a.set(h, _), l = l || k;
     }
-    return [c, f];
-  }, o = new V(n()[0]), s = o.asObservable(), i = (c) => {
-    o.next(c);
+    return [a, l];
+  }, o = new L(n()[0]), s = o.asObservable(), i = (a) => {
+    o.next(a);
   };
-  let u = [
+  let c = [
     () => {
       if (!e) {
-        let [c, f] = l();
-        f || i(c);
+        let [a, l] = u();
+        l || i(a);
       }
     }
   ];
-  const l = () => {
+  const u = () => {
     e = !0;
-    const [c, f] = n();
-    return f && i(c), e = !1, [c, f];
-  }, a = (c) => {
-    var f;
-    return r.has(c) ? (f = r.get(c)) == null ? void 0 : f.get() : [void 0, !1];
-  }, b = (c, f) => {
+    const [a, l] = n();
+    return l && i(a), e = !1, [a, l];
+  }, b = (a) => {
+    var l;
+    return r.has(a) ? (l = r.get(a)) == null ? void 0 : l.get() : [void 0, !1];
+  }, f = (a, l) => {
     var h;
-    if (!r.has(c)) {
-      const d = S(void 0);
-      u.forEach((_) => {
-        d.subscribe(
-          (k) => _(c, k),
+    if (!r.has(a)) {
+      const y = S(void 0);
+      c.forEach((_) => {
+        y.subscribe(
+          (k) => _(a, k),
           /*skipInitialNotify=*/
           !0
         );
-      }), r.set(c, d);
+      }), r.set(a, y);
     }
-    return (h = r.get(c)) == null ? void 0 : h.setDefer(f);
-  }, g = (c) => {
-    var f;
-    for (const [h, d] of r)
-      c.has(h) || (f = r.get(h)) == null || f.setDefer(void 0), r.delete(h);
-    for (const [h, d] of c.entries())
-      b(h, d);
-    return l;
-  }, p = (c, f) => {
-    let [h, d] = b(c, f)();
-    return d;
-  }, v = (c) => {
-    let [f, h] = g(c)();
+    return (h = r.get(a)) == null ? void 0 : h.setDefer(l);
+  }, d = (a) => {
+    var l;
+    for (const [h, y] of r)
+      a.has(h) || (l = r.get(h)) == null || l.setDefer(void 0), r.delete(h);
+    for (const [h, y] of a.entries())
+      f(h, y);
+    return u;
+  }, p = (a, l) => {
+    let [h, y] = f(a, l)();
+    return y;
+  }, v = (a) => {
+    let [l, h] = d(a)();
     return h;
-  }, O = (c, f = !1) => (l(), f && s.pipe(z(1)).subscribe(c), s.subscribe(c)), y = (c) => {
-    const f = r.get(c);
-    if (f !== void 0)
-      return f;
+  }, w = (a, l = !1) => (u(), l && s.pipe(V(1)).subscribe(a), s.subscribe(a)), g = (a) => {
+    const l = r.get(a);
+    if (l !== void 0)
+      return l;
     {
-      const h = w(void 0);
-      return r.set(c, h), u.forEach((d) => {
+      const h = S(void 0);
+      return r.set(a, h), c.forEach((y) => {
         h.subscribe(
-          (_) => d(c, _),
+          (_) => y(a, _),
           /*skipInitialNotify*/
           !0
         );
       }), h;
     }
-  }, oe = (c, f, h = !1) => {
-    var d;
-    (d = y(c)) == null || d.subscribe(f, h);
-  }, se = (c, f = !1) => {
-    u.push(c);
-    for (const [h, d] of r)
-      d.subscribe((_) => c(h, _), f);
+  }, oe = (a, l, h = !1) => {
+    var y;
+    (y = g(a)) == null || y.subscribe(l, h);
+  }, se = (a, l = !1) => {
+    c.push(a);
+    for (const [h, y] of r)
+      y.subscribe((_) => a(h, _), l);
   };
-  return t == null || t.forEach((c, f) => {
-    p(f, c);
+  return t == null || t.forEach((a, l) => {
+    p(l, a);
   }), {
-    get: l,
-    setKeyDefer: b,
+    get: u,
+    setKeyDefer: f,
     setKey: p,
-    getKey: a,
-    setDefer: g,
+    getKey: b,
+    setDefer: d,
     set: v,
-    getKeyNode: y,
+    getKeyNode: g,
     subscribeKey: oe,
     subscribeKeys: se,
-    subscribe: O
+    subscribe: w,
+    decompose: () => r
   };
 }
-function w(t) {
+function O(t) {
   if (Ee(t))
     return S(
       t.value,
@@ -798,38 +799,38 @@ function w(t) {
     let r = {};
     const e = t;
     for (const n in e)
-      r[n] = w(e[n]);
-    return B(r);
+      r[n] = O(e[n]);
+    return z(r);
   }
   return S(t);
 }
 function ke(t, r, e) {
-  const [n, o] = t.get(), s = r(n), i = e == null ? s : te(s, e), u = w(i);
-  return t.subscribe((l) => u.set(r(l)), !0), u;
+  const [n, o] = t.get(), s = r(n), i = e == null ? s : te(s, e), c = O(i);
+  return t.subscribe((u) => c.set(r(u)), !0), c;
 }
 function Te(t, r) {
   return (...e) => r(t.get()[0], ...e);
 }
 function Ue(t, r, e) {
-  const n = w(t);
+  const n = O(t);
   return r.subscribe((o) => {
     let s = !0;
     do {
-      const [i, u] = n.get(), l = e({ self: i, read: o });
-      s = n.set(l);
+      const [i, c] = n.get(), u = e({ self: i, read: o });
+      s = n.set(u);
     } while (s);
   }), n;
 }
 function Ke(t, r, e) {
   const n = A();
   return t.subscribeKeys((o, s) => {
-    const [i, u] = r.get(), [l, a] = e(o, s, i);
-    n.setKey(l, a);
+    const [i, c] = r.get(), [u, b] = e(o, s, i);
+    n.setKey(u, b);
   }), r.subscribe((o) => {
     const s = t.get()[0];
-    for (const [i, u] of s) {
-      const [l, a] = e(i, u, o);
-      n.setKeyDefer(l, a);
+    for (const [i, c] of s) {
+      const [u, b] = e(i, c, o);
+      n.setKeyDefer(u, b);
     }
     n.get();
   }), n;
@@ -855,8 +856,8 @@ function Ce(t, r, e) {
 }
 function ne(t, r, e, n) {
   return (...o) => {
-    const [s, i] = (e == null ? void 0 : e.get()) ?? [void 0, !1], u = n(s, ...o);
-    return r.set(u);
+    const [s, i] = (e == null ? void 0 : e.get()) ?? [void 0, !1], c = n(s, ...o);
+    return r.set(c);
   };
 }
 function Ie(t, r, e) {
@@ -865,12 +866,12 @@ function Ie(t, r, e) {
 const Be = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   action: Ce,
-  compose: B,
+  compose: z,
   composeRead: re,
   compositeNode: Ae,
   dependentAction: ne,
   edge: ke,
-  makeDeepNode: w,
+  makeDeepNode: O,
   makeSelector: Te,
   makeShallow: te,
   mapEdge: De,
@@ -895,25 +896,25 @@ const Be = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   r.subscribe((e) => {
     e !== void 0 && (t.textContent = e);
   });
-}, Ve = (t, r) => {
+}, Le = (t, r) => {
   r.subscribe((e) => {
-    e !== void 0 && (t.style.display = e ? "" : "none");
+    console.log(t, t.classList), e !== void 0 && (t.style.display = e ? "" : "none", t.classList.contains("hidden") && e && t.classList.remove("hidden"));
   });
 }, Ye = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   classMap: Re,
-  show: Ve,
+  show: Le,
   style: qe,
   text: Fe
-}, Symbol.toStringTag, { value: "Module" })), ze = (t, r, e = 1) => Array.from(
+}, Symbol.toStringTag, { value: "Module" })), Ve = (t, r, e = 1) => Array.from(
   { length: (r - t) / e + 1 },
   (n, o) => t + o * e
-), Le = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+), Ne = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  arrayRange: ze
+  arrayRange: Ve
 }, Symbol.toStringTag, { value: "Module" }));
 export {
   Ye as graphRender,
   Be as graphState,
-  Le as graphUtil
+  Ne as graphUtil
 };

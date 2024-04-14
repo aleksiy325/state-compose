@@ -47,13 +47,13 @@ export type CompositeNodeValues<T> = {
 	[P in keyof T]: AnyNode<T[P]>;
 };
 export interface ReadableCompositeNode<T> extends ReadableNode<T> {
-	nodes: ReadableCompositeNodeValues<T>;
+	decompose(): ReadableCompositeNodeValues<T>;
 }
 export interface WritableCompositeNode<T> extends WritableNode<T> {
-	nodes: WritableCompositeNodeValues<T>;
+	decompose(): WritableCompositeNodeValues<T>;
 }
 export interface CompositeNode<T> extends ReadableCompositeNode<T>, WritableCompositeNode<T>, StateNode<T> {
-	nodes: CompositeNodeValues<T>;
+	decompose(): CompositeNodeValues<T>;
 }
 export interface WritableMapNode<K, V> extends WritableNode<ReadonlyMap<K, V>> {
 	setKey: (key: K, value: V | undefined) => boolean;
@@ -67,6 +67,7 @@ export interface ReadableMapNode<K, V> extends ReadableNode<ReadonlyMap<K, V>> {
 	getKeyNode: (key: K) => AnyNode<V | undefined>;
 	subscribeKey: (key: K, notify: Notify<V | undefined>, skipInitialNotify?: boolean) => void;
 	subscribeKeys: (notify: NotifyKey<K, V | undefined>, skipInitialNotify?: boolean) => void;
+	decompose(): Map<K, ReadableNode<V | undefined>>;
 }
 export interface MapNode<K, V> extends WritableMapNode<K, V>, ReadableMapNode<K, V>, StateNode<ReadonlyMap<K, V>> {
 }
@@ -98,7 +99,7 @@ declare function mapEdge<IV, OK, OV>(read: ReadableNode<IV>, keyUpdateFunc: (rea
 	OK,
 	OV
 ][]): ReadableMapNode<OK, OV>;
-declare function mapKeyEdge<K, V>(read: ReadableMapNode<K, V>, key: K): StateNode<V | undefined>;
+declare function mapKeyEdge<K, V>(read: ReadableMapNode<K, V>, key: K): ReadableNode<V | undefined>;
 declare function action<T, Args extends any[]>(name: string, mutate: WritableNode<T>, transitionFunc: (...args: Args) => T): (...args: Args) => boolean;
 declare function dependentAction<T, U, Args extends any[]>(name: string, mutate: WritableNode<T>, read: ReadableNode<U>, transitionFunc: (read: U, ...args: Args) => T): (...args: Args) => boolean;
 declare function selfAction<T, Args extends any[]>(name: string, readMutate: StateNode<T>, transitionFunc: (read: T, ...args: Args) => T): (...args: Args) => boolean;
