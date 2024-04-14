@@ -14,6 +14,7 @@ import {
   undefnode,
 } from "./graphState";
 import { arrayRange } from "./utils";
+import { subscribe } from "diagnostics_channel";
 
 test("node counter", () => {
   let subscribeValues1: number[] = [];
@@ -988,21 +989,49 @@ test("deepNode undefined", () => {
   }
   const $node = makeDeepNode<undefined | Test>(undefined);
 
+  // TODO: finish test
   expect($node.get()).toEqual([undefined, false]);
-
-  // $node.decompose()
   $node.set({ a: 1, b: 2 });
   expect($node.get()).toEqual([{ a: 1, b: 2 }, false]);
+});
 
-  // const setAll = action("setAll", $node, (next: number) => {
-  //   return {
-  //     a: next,
-  //     b: { c: next, d: next + 1 },
-  //   };
-  // });
+test("deepNode composite Record", () => {
+  interface TestState {
+    quantity: number;
+    order: number;
+  }
 
-  // expect($node.get()).toEqual([{ a: 1, b: { c: 1, d: 2 } }, false]);
+  const $state = makeDeepNode<{ [key: string]: TestState }>({});
 
-  // expect(setAll(2)).toEqual(true);
-  // expect($node.get()).toEqual([{ a: 2, b: { c: 2, d: 3 } }, false]);
+  $state.set({
+    ["1"]: {
+      quantity: 0,
+      order: 0,
+    },
+  });
+
+  const $1 = $state.decompose()["1"];
+  const $1Quantity = $1.decompose().quantity;
+
+  expect($state.get()).toEqual([{ "1": { quantity: 0, order: 0 } }, false]);
+  expect($1.get()).toEqual([{ quantity: 0, order: 0 }, false]);
+  expect($1Quantity.get()).toEqual([0, false]);
+
+  let stateVals: { [key: string]: TestState }[] = [];
+  $state.subscribe(val => {
+    stateVals.push(val);
+  });
+  let oneVals: TestState[] = [];
+  $1.subscribe(val => {
+    oneVals.push(val);
+  });
+  let oneQuantityVals: number[] = [];
+  $1Quantity.subscribe(val => {
+    oneQuantityVals.push(val);
+  });
+
+  $1Quantity.set(1);
+  expect($1Quantity.get()).toEqual([1, false]);
+  expect($1.get()).toEqual([{ quantity: 1, order: 0 }, false]);
+  expect($state.get()).toEqual([{ "1": { quantity: 1, order: 0 } }, false]);
 });

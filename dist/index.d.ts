@@ -60,18 +60,19 @@ export interface CompositeNode<T> extends ReadableCompositeNode<T>, WritableComp
 	decompose(): CompositeNodeValues<T>;
 }
 export interface WritableMapNode<K, V> extends WritableNode<ReadonlyMap<K, V>> {
-	setKey: (key: K, value: V | undefined) => boolean;
-	setKeyDefer: (key: K, value: V | undefined) => Get<V | undefined>;
+	setKey: (key: K, value: V) => boolean;
+	setKeyDefer: (key: K, value: V) => Get<V>;
 }
 export interface ReadableMapNode<K, V> extends ReadableNode<ReadonlyMap<K, V>> {
 	getKey: (key: K) => [
-		V | undefined,
+		V,
 		boolean
 	];
-	getKeyNode: (key: K) => AnyNode<V | undefined>;
-	subscribeKey: (key: K, notify: Notify<V | undefined>, skipInitialNotify?: boolean) => void;
-	subscribeKeys: (notify: NotifyKey<K, V | undefined>, skipInitialNotify?: boolean) => void;
-	decompose(): Map<K, ReadableNode<V | undefined>>;
+	getKeyNode: (key: K) => AnyNode<V>;
+	subscribeKey: (key: K, notify: Notify<V>, skipInitialNotify?: boolean) => void;
+	subscribeKeys: (notify: NotifyKey<K, V>, skipInitialNotify?: boolean) => void;
+	decompose(): Map<K, ReadableNode<V>>;
+	defaultFactory: (key: K) => V;
 }
 export interface MapNode<K, V> extends WritableMapNode<K, V>, ReadableMapNode<K, V>, StateNode<ReadonlyMap<K, V>> {
 }
@@ -86,7 +87,7 @@ declare const undefnode: StateNode<undefined>;
 declare function composeRead<T extends object>(inputNodes: ReadableCompositeNodeValues<T>): ReadableCompositeNode<T>;
 declare function compose<T extends object>(inputNodes: CompositeNodeValues<T>): CompositeNode<T>;
 declare function compositeNode<T extends object>(initialValue: T): CompositeNode<T>;
-declare function mapNode<K, V>(initialValue?: ReadonlyMap<K, V> | undefined): MapNode<K, V>;
+declare function mapNode<K, V>(defaultFactory: (key: K) => V, initialValue?: ReadonlyMap<K, V>): MapNode<K, V>;
 declare function makeDeepNode<T>(initVal: T | Shallow<T>): AnyNode<T>;
 declare function edge<IV, OV>(read: ReadableNode<IV>, transformFunc: (input: IV) => OV, isEqual?: (a: OV, b: OV) => boolean): ReadableAnyNode<OV>;
 declare function makeSelector<IV, OV, Args extends any[]>(read: ReadableNode<IV>, transformFunc: (input: IV, ...args: Args) => OV): (...args: Args) => OV;
@@ -95,14 +96,14 @@ transformFunc: (v: {
 	self: T;
 	read: IV;
 }) => T): AnyNode<T>;
-declare function mapToMapEdge<IK, IV, OK, OV, RV>(readMap: ReadableMapNode<IK, IV>, read: ReadableNode<RV>, transformFunc: (key: IK, value: IV | undefined, read: RV) => [
-	OK,
-	OV | undefined
-]): ReadableMapNode<OK, OV>;
+declare function mapToMapEdge<K, IV, OV, RV>(readMap: ReadableMapNode<K, IV>, read: ReadableNode<RV>, transformFunc: (key: K, value: IV, read: RV) => [
+	K,
+	OV
+]): ReadableMapNode<K, OV>;
 declare function mapEdge<IV, OK, OV>(read: ReadableNode<IV>, keyUpdateFunc: (read: IV) => [
 	OK,
 	OV
-][]): ReadableMapNode<OK, OV>;
+][], defaultFactory: (key: OK) => OV): ReadableMapNode<OK, OV>;
 declare function mapKeyEdge<K, V>(read: ReadableMapNode<K, V>, key: K): ReadableNode<V | undefined>;
 declare function action<T, Args extends any[]>(name: string, mutate: WritableNode<T>, transitionFunc: (...args: Args) => T): (...args: Args) => boolean;
 declare function dependentAction<T, U, Args extends any[]>(name: string, mutate: WritableNode<T>, read: ReadableNode<U>, transitionFunc: (read: U, ...args: Args) => T): (...args: Args) => boolean;
