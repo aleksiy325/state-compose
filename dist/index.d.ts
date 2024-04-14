@@ -9,10 +9,14 @@ export type Get<T> = () => [
 export interface ReadableNode<T> {
 	get: Get<T>;
 	subscribe: (notify: Notify<T>, skipInitialNotify?: boolean) => void;
+	edge<OV>(transformFunc: (input: T, isEqual?: (a: OV, b: OV) => boolean) => OV): ReadableAnyNode<OV>;
 }
 export interface WritableNode<T> {
 	set: (value: T) => boolean;
 	setDefer: (value: T) => Get<T>;
+	action: <Args extends any[]>(name: string, transitionFunc: (...args: Args) => T) => (...args: Args) => boolean;
+	dependentAction<U, Args extends any[]>(name: string, read: ReadableNode<U>, transitionFunc: (read: U, ...args: Args) => T): (...args: Args) => boolean;
+	selfAction<Args extends any[]>(name: string, transitionFunc: (read: T, ...args: Args) => T): (...args: Args) => boolean;
 }
 export type ReadableAnyNode<T> = [
 	T

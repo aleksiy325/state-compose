@@ -17,12 +17,27 @@ export type Get<T> = () => [T, boolean];
 export interface ReadableNode<T> {
   get: Get<T>;
   subscribe: (notify: Notify<T>, skipInitialNotify?: boolean) => void;
-  edge<OV>(transformFunc: (input: T) => OV): ReadableAnyNode<OV>;
+  edge<OV>(
+    transformFunc: (input: T, isEqual?: (a: OV, b: OV) => boolean) => OV
+  ): ReadableAnyNode<OV>;
 }
 
 export interface WritableNode<T> {
   set: (value: T) => boolean;
   setDefer: (value: T) => Get<T>;
+  action: <Args extends any[]>(
+    name: string,
+    transitionFunc: (...args: Args) => T
+  ) => (...args: Args) => boolean;
+  dependentAction<U, Args extends any[]>(
+    name: string,
+    read: ReadableNode<U>,
+    transitionFunc: (read: U, ...args: Args) => T
+  ): (...args: Args) => boolean;
+  selfAction<Args extends any[]>(
+    name: string,
+    transitionFunc: (read: T, ...args: Args) => T
+  ): (...args: Args) => boolean;
 }
 
 export type ReadableAnyNode<T> =
@@ -235,12 +250,35 @@ export function node<T>(
     return _edge(get, subscribe, transformFunc, isEqual);
   };
 
+  const action = <Args extends any[]>(
+    name: string,
+    transitionFunc: (...args: Args) => T
+  ) => {
+    return _action(name, set, transitionFunc);
+  };
+  const dependentAction = <U, Args extends any[]>(
+    name: string,
+    read: ReadableNode<U>,
+    transitionFunc: (read: U, ...args: Args) => T
+  ) => {
+    return _dependentAction(name, set, read.get, transitionFunc);
+  };
+  const selfAction = <Args extends any[]>(
+    name: string,
+    transitionFunc: (readMutate: T, ...args: Args) => T
+  ) => {
+    return _dependentAction(name, set, get, transitionFunc);
+  };
+
   return {
     get,
     set,
     setDefer,
     subscribe,
     edge,
+    action,
+    dependentAction,
+    selfAction,
   };
 }
 
@@ -373,6 +411,26 @@ export function compose<T extends object>(
     return _edge(read.get, read.subscribe, transformFunc, isEqual);
   };
 
+  const action = <Args extends any[]>(
+    name: string,
+    transitionFunc: (...args: Args) => T
+  ) => {
+    return _action(name, set, transitionFunc);
+  };
+  const dependentAction = <U, Args extends any[]>(
+    name: string,
+    read: ReadableNode<U>,
+    transitionFunc: (read: U, ...args: Args) => T
+  ) => {
+    return _dependentAction(name, set, read.get, transitionFunc);
+  };
+  const selfAction = <Args extends any[]>(
+    name: string,
+    transitionFunc: (readMutate: T, ...args: Args) => T
+  ) => {
+    return _dependentAction(name, set, read.get, transitionFunc);
+  };
+
   return {
     decompose: decompose,
     get: read.get,
@@ -380,6 +438,9 @@ export function compose<T extends object>(
     setDefer,
     set,
     edge: edge,
+    action,
+    dependentAction,
+    selfAction,
   };
 }
 
@@ -557,6 +618,29 @@ export function mapNode<K, V>(
     return _edge(get, subscribe, transformFunc, isEqual);
   };
 
+  const action = <Args extends any[]>(
+    name: string,
+    transitionFunc: (...args: Args) => ReadonlyMap<K, V>
+  ) => {
+    return _action(name, set, transitionFunc);
+  };
+  const dependentAction = <U, Args extends any[]>(
+    name: string,
+    read: ReadableNode<U>,
+    transitionFunc: (read: U, ...args: Args) => ReadonlyMap<K, V>
+  ) => {
+    return _dependentAction(name, set, read.get, transitionFunc);
+  };
+  const selfAction = <Args extends any[]>(
+    name: string,
+    transitionFunc: (
+      readMutate: ReadonlyMap<K, V>,
+      ...args: Args
+    ) => ReadonlyMap<K, V>
+  ) => {
+    return _dependentAction(name, set, get, transitionFunc);
+  };
+
   return {
     get,
     setKeyDefer,
@@ -570,6 +654,9 @@ export function mapNode<K, V>(
     subscribe,
     decompose,
     edge,
+    action,
+    dependentAction,
+    selfAction,
   };
 }
 
@@ -622,6 +709,7 @@ export function edge<IV, OV>(
   return _edge(read.get, read.subscribe, transformFunc, isEqual);
 }
 
+// TODO: Do we need this?
 export function makeSelector<IV, OV, Args extends any[]>(
   read: ReadableNode<IV>,
   transformFunc: (input: IV, ...args: Args) => OV
@@ -700,15 +788,37 @@ export function mapKeyEdge<K, V>(
   return $out;
 }
 
+function _action<T, Args extends any[]>(
+  name: string,
+  set: (value: T) => boolean,
+  transitionFunc: (...args: Args) => T
+) {
+  name;
+  return (...args: Args) => {
+    let nextValue = transitionFunc(...args);
+    return set(nextValue);
+  };
+}
+
 export function action<T, Args extends any[]>(
   name: string,
   mutate: WritableNode<T>,
   transitionFunc: (...args: Args) => T
 ) {
-  name; // todo: fix
-  return (...args: Args): boolean => {
-    let nextValue = transitionFunc(...args);
-    return mutate.set(nextValue);
+  return _action(name, mutate.set, transitionFunc);
+}
+
+function _dependentAction<T, U, Args extends any[]>(
+  name: string,
+  set: (value: T) => boolean,
+  get: () => [U, boolean],
+  transitionFunc: (read: U, ...args: Args) => T
+) {
+  name;
+  return (...args: Args) => {
+    const [readValue, _] = get();
+    let nextValue = transitionFunc(readValue, ...args);
+    return set(nextValue);
   };
 }
 
@@ -718,12 +828,7 @@ export function dependentAction<T, U, Args extends any[]>(
   read: ReadableNode<U>,
   transitionFunc: (read: U, ...args: Args) => T
 ) {
-  name; // todo: fix
-  return (...args: Args): boolean => {
-    const [readValue, _] = read?.get() ?? [undefined, false];
-    const nextValue = transitionFunc(readValue, ...args);
-    return mutate.set(nextValue);
-  };
+  return _dependentAction(name, mutate.set, read.get, transitionFunc);
 }
 
 export function selfAction<T, Args extends any[]>(

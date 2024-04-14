@@ -643,7 +643,7 @@ test("compose test", () => {
 
 test("edge test", () => {
   const $in = node(1);
-  const $out = edge($in, val => val + 1);
+  const $out = $in.edge(val => val + 1);
 
   const values: number[] = [];
   $out.subscribe(val => {
@@ -668,7 +668,7 @@ test("edge test", () => {
 
 test("multiEdge test", () => {
   const $in = compositeNode({ a: 1, b: 2 });
-  const $out = edge($in, val => ({
+  const $out = $in.edge(val => ({
     a: val.a + 1,
     b: val.b + 1,
     c: val.a + val.b,
