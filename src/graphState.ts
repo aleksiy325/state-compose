@@ -17,9 +17,7 @@ export type Get<T> = () => [T, boolean];
 export interface ReadableNode<T> {
   get: Get<T>;
   subscribe: (notify: Notify<T>, skipInitialNotify?: boolean) => void;
-  // edge<IV, OV>(
-  //   transformFunc: (input: IV) => OV,
-  // ): ReadableAnyNode<OV>;
+  edge<OV>(transformFunc: (input: T) => OV): ReadableAnyNode<OV>;
 }
 
 export interface WritableNode<T> {
@@ -229,11 +227,20 @@ export function node<T>(
     }
     return observable.subscribe(notify);
   };
+
+  const edge = <OV>(
+    transformFunc: (input: T) => OV,
+    isEqual?: (a: OV, b: OV) => boolean // if set makes shallow node.
+  ) => {
+    return _edge(get, subscribe, transformFunc, isEqual);
+  };
+
   return {
     get,
     set,
     setDefer,
     subscribe,
+    edge,
   };
 }
 
@@ -311,10 +318,18 @@ export function composeRead<T extends object>(
     return nodes;
   };
 
+  const edge = <OV>(
+    transformFunc: (input: T) => OV,
+    isEqual?: (a: OV, b: OV) => boolean // if set makes shallow node.
+  ) => {
+    return _edge(get, subscribe, transformFunc, isEqual);
+  };
+
   return {
     decompose: decompose,
     get,
     subscribe,
+    edge: edge,
   };
 }
 
@@ -351,12 +366,20 @@ export function compose<T extends object>(
     return nodes;
   };
 
+  const edge = <OV>(
+    transformFunc: (input: T) => OV,
+    isEqual?: (a: OV, b: OV) => boolean // if set makes shallow node.
+  ) => {
+    return _edge(read.get, read.subscribe, transformFunc, isEqual);
+  };
+
   return {
     decompose: decompose,
     get: read.get,
     subscribe: read.subscribe,
     setDefer,
     set,
+    edge: edge,
   };
 }
 
@@ -527,6 +550,13 @@ export function mapNode<K, V>(
     return mapValue;
   };
 
+  const edge = <OV>(
+    transformFunc: (input: ReadonlyMap<K, V>) => OV,
+    isEqual?: (a: OV, b: OV) => boolean // if set makes shallow node.
+  ) => {
+    return _edge(get, subscribe, transformFunc, isEqual);
+  };
+
   return {
     get,
     setKeyDefer,
@@ -539,6 +569,7 @@ export function mapNode<K, V>(
     subscribeKeys,
     subscribe,
     decompose,
+    edge,
   };
 }
 
@@ -568,18 +599,27 @@ export function makeDeepNode<T>(initVal: T | Shallow<T>): AnyNode<T> {
   return node<T>(initVal as T) as unknown as AnyNode<T>; // TODO: not sure if this is correct?
 }
 
+function _edge<IV, OV>(
+  get: Get<IV>,
+  subscribe: (notify: Notify<IV>, skipInitialNotify?: boolean) => void,
+  transformFunc: (input: IV) => OV,
+  isEqual?: (a: OV, b: OV) => boolean // if set makes shallow node.
+): ReadableAnyNode<OV> {
+  const [val, _] = get();
+  const initVal = transformFunc(val);
+  const inputVal =
+    isEqual == undefined ? initVal : makeShallow(initVal, isEqual);
+  const outputNode = makeDeepNode(inputVal);
+  subscribe(value => outputNode.set(transformFunc(value)), true); // Need to skip initial notify
+  return outputNode;
+}
+
 export function edge<IV, OV>(
   read: ReadableNode<IV>,
   transformFunc: (input: IV) => OV,
   isEqual?: (a: OV, b: OV) => boolean // if set makes shallow node.
 ): ReadableAnyNode<OV> {
-  const [val, _] = read.get();
-  const initVal = transformFunc(val);
-  const inputVal =
-    isEqual == undefined ? initVal : makeShallow(initVal, isEqual);
-  const outputNode = makeDeepNode(inputVal);
-  read.subscribe(value => outputNode.set(transformFunc(value)), true); // Need to skip initial notify.
-  return outputNode;
+  return _edge(read.get, read.subscribe, transformFunc, isEqual);
 }
 
 export function makeSelector<IV, OV, Args extends any[]>(
